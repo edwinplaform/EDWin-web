@@ -5,7 +5,7 @@ import Link from "next/link";
 const Banner = () => {
     return (
         <section>
-            <div className="mx-auto w-full bg-teal-400 px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-12">
+            <div className="mx-auto w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-12">
                 <div className="mx-20 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
                     <div className="relative h-64 overflow-hidden rounded-lg sm:h-80 lg:order-last lg:h-full ">
                         <Image
@@ -25,7 +25,7 @@ const Banner = () => {
                             fingertips.
                         </p>
 
-                        <Link href="/courses" className="mt-8 inline-block rounded bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-900">
+                        <Link href="/courses" className="mt-8 inline-block ring-black ring-2 rounded bg-blue-700 px-12 py-3 text-sm font-medium text-white transition hover:bg-blue-800">
                             Enroll Now
                         </Link>
                     </div>
