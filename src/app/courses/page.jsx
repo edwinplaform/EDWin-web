@@ -1,4 +1,5 @@
 import CourseCard from "@/components/CourseCard";
+import {Pagination} from "antd";
 
 const Courses = [
     {
@@ -47,14 +48,17 @@ const Courses = [
 const CoursesPage = () => {
     return (
         <div>
-            <div>Science</div>
-            <div className="flex justify-center lg:flex-row mx-8 sm:flex-col ">
-                {Courses.map((course) =>(
-                    <CourseCard key={course.id} name={course.name} title={course.title} grade={course.grade} price={course.price} image={course.image} />
-                ))}
+            <div>
+                <div className="flex justify-center lg:flex-row mx-8 sm:flex-col ">
+                    {Courses.map((course) =>(
+                        <CourseCard key={course.id} name={course.name} title={course.title} grade={course.grade} price={course.price} image={course.image} />
+                    ))}
+                </div>
+            </div>
+            <div className="p-10">
+            <Pagination align="center" defaultCurrent={1} defaultPage={40} />
             </div>
         </div>
-
     );
 };
 
