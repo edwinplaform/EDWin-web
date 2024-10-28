@@ -1,7 +1,11 @@
 import TutorCard from "@/components/TutorCard";
 import Filter from "@/components/Filter";
+import {currentUser} from "@clerk/nextjs/server";
+import Nav from "@/components/Nav";
 
 const TutorPage = () => {
+
+    const user = currentUser();
 
     const profiles = [
         {
@@ -44,6 +48,7 @@ const TutorPage = () => {
 
     return (
         <div className="bg-bgColorWhite">
+            {user && <Nav/>}
             <div className="justify-center items-center p-6">
                 <Filter />
             </div>
