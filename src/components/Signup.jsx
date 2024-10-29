@@ -2,8 +2,31 @@
 
 import * as Clerk from '@clerk/elements/common'
 import * as SignUp from '@clerk/elements/sign-up'
+import {useUser} from "@clerk/nextjs";
+import {useEffect} from "react";
 
-const Signup = ({href}) => {
+const Signup = ({href, role}) => {
+
+    const {user, isSignedIn} = useUser();
+
+    useEffect(()=> {
+        if (isSignedIn && role) {
+            const upgradeRole = {
+                method: "POST",
+                headers: {'content-type': 'application/json'},
+                body: JSON.stringify({userId: user.id, role: role}),
+            };
+
+            fetch('http://localhost:8081/api/v1/users/upgradeRole', upgradeRole)
+                .then(res => res.json())
+                .then(data => console.log("Register successfully!"));
+        } else {
+            console.log("please log in");
+        }
+    },[isSignedIn]);
+
+
+
     return (
         <div className="h-screen flex items-center justify-center bg-customLime">
             <SignUp.Root>

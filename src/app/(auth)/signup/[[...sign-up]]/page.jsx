@@ -3,7 +3,7 @@ import Signup from "@/components/Signup";
 const SignUpPage = () => {
     return (
         <div>
-            <Signup href="/login"/>
+            <Signup href="/login" role="student"/>
         </div>
     );
 };

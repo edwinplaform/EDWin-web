@@ -1,8 +1,26 @@
+"use client"
+
 import Image from "next/image";
 import Banner from "@/components/Banner";
 import Link from "next/link";
+import {useAuth, useUser} from "@clerk/nextjs";
+import {useRouter} from "next/navigation";
+import {useEffect} from "react";
 
 export default function Home() {
+
+    const {user} = useUser();
+    const router = useRouter();
+
+    useEffect(() => {
+        const role = user?.publicMetadata.role;
+
+        if (role) {
+                router.push('/tutor/onboarding');
+        }
+    },[user,router]);
+
+
   return (
       <div>
           <Banner/>
