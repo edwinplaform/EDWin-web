@@ -21,7 +21,7 @@ const schema = z.object({
     email: z.string().email( {message: "Email is required!"}),
     hourlyRate: z.number().min(1, {message: "Hourly rate is required!"}),
     availableDate: z.date({message: "Available date is required!"}),
-    // qualifications: z.string().min(1, {message: "Qualification is required!"}),
+    // qualifications: z.string().min(1, {chat: "Qualification is required!"}),
     courseName:z.string().min(1, {message: "Course name is required!"}),
     institute:z.string().min(1, {message: "Institute is required!"}),
     description: z.string().min(1, {message: "Description is required!"}),

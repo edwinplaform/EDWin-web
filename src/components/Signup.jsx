@@ -4,6 +4,7 @@ import * as Clerk from '@clerk/elements/common'
 import * as SignUp from '@clerk/elements/sign-up'
 import {useUser} from "@clerk/nextjs";
 import {useEffect} from "react";
+import {saveUserData} from "@/util/Role";
 
 const Signup = ({href, role}) => {
 
@@ -20,10 +21,11 @@ const Signup = ({href, role}) => {
             fetch('http://localhost:8081/api/v1/users/upgradeRole', upgradeRole)
                 .then(res => res.json())
                 .then(data => console.log("Register successfully!"));
+
         } else {
             console.log("please log in");
         }
-    },[isSignedIn]);
+    },[isSignedIn, role, user.id]);
 
 
 
