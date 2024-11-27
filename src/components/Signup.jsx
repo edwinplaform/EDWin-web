@@ -25,10 +25,15 @@ const Signup = ({href, role}) => {
         } else {
             console.log("please log in");
         }
+
+    },[isSignedIn, role]);
+
     },[isSignedIn, role, user.id]);
 
 
 
+
+    
     return (
         <div className="h-screen flex items-center justify-center bg-customLime">
             <SignUp.Root>
