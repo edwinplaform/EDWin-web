@@ -17,6 +17,7 @@ const schema = z.object({
     lastName: z.string().min(1, {message: "Last name is required!"}),
     phone: z.string().min(9, {message: "Valid phone number is required!"}),
     address: z.string().min(1, {message: "Address is required!"}),
+
     subjects: z.array(z.string().min(1, {message: "Subject is required!"})),
     // email: z.string().email({message: "Valid email is required!"}),
     hourlyRate: z.coerce.number().min(1, {message: "Hourly rate is required!"}),
@@ -44,6 +45,17 @@ const schema = z.object({
         endTime: z.string().min(1, {message: "End time is required!"}),
         preferredSlots: z.array(z.string()).optional(),
     }),
+
+    subject: z.string().min(1, {message: "Subject is required!"}),
+    email: z.string().email( {message: "Email is required!"}),
+    hourlyRate: z.number().min(1, {message: "Hourly rate is required!"}),
+    availableDate: z.date({message: "Available date is required!"}),
+    // qualifications: z.string().min(1, {chat: "Qualification is required!"}),
+    courseName:z.string().min(1, {message: "Course name is required!"}),
+    institute:z.string().min(1, {message: "Institute is required!"}),
+    description: z.string().min(1, {message: "Description is required!"}),
+    certificate : z.instanceof(File,{message:"Document is required!"}),
+    currency: z.enum(["LKR","USD"],{message:"Currency is required!"}),
 })
 
 

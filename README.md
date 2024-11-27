@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# EDWin E-tuition Platform
 
-## Getting Started
+## Overview
 
-First, run the development server:
+EDWin is an innovative online tutoring platform designed to enhance the educational experience for students in Sri Lanka. The platform connects students with qualified tutors through a user-friendly interface, offering one-on-one live tutoring sessions. EDWin aims to improve access to quality education while promoting environmental sustainability.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **User Registration and Authentication**: Secure user registration and login for students and tutors.
+- **Real-Time Tutoring**: Live interactions between students and tutors.
+- **Course Management**: Ability to browse and enroll in various subjects.
+- **Session Scheduling**: Schedule tutoring sessions with available tutors.
+- **Feedback System**: Students can provide feedback on their tutoring sessions.
+- **Responsive Design**: Optimized for both desktop and mobile devices.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Technologies Used
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **Frontend**: React.js, Next.js
+- **Backend**: Node.js, Express.js
+- **Database**: MySQL
+- **Authentication**: JWT (JSON Web Tokens)
+- **Real-Time Communication**: WebRTC / Socket.IO
+- **Styling**: Tailwind.css
 
-## Learn More
+## Installation
 
-To learn more about Next.js, take a look at the following resources:
+To run the project locally, follow these steps:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Clone the repository:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+   ```bash
+   https://github.com/ksulakshana02/EDWin-web.git
+   ```
+2. Navigate to the project directory:
 
-## Deploy on Vercel
+   ```bash
+   cd EDWin-web
+   ```
+3. Install the dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the development server:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   npm run dev
+   ```
+5. Open your browser and navigate to `http://localhost:3000`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Usage
+
+- **Register** : Create an account as a student or tutor.
+- **Login** : Use your credentials to log in.
+- **Browse Subjects** : Explore the available subjects and select one to enroll.
+- **Schedule Sessions** : Choose a tutor and schedule your tutoring sessions.
+- **Provide Feedback** : After each session, provide feedback to help improve the platform.
+
+  
+
+
+
+
+
+
+   

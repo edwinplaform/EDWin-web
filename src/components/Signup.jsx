@@ -25,7 +25,13 @@ const Signup = ({href, role}) => {
         } else {
             console.log("please log in");
         }
+
     },[isSignedIn, role]);
+
+    },[isSignedIn, role, user.id]);
+
+
+
 
     
     return (

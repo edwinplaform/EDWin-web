@@ -48,7 +48,7 @@ const TutorPage = () => {
 
     return (
         <div className="bg-bgColorWhite">
-            {user && <Nav/>}
+            {user ? <Nav/> : " "}
             <div className="justify-center items-center p-6">
                 <Filter />
             </div>
