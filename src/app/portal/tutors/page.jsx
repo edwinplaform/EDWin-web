@@ -181,7 +181,7 @@ const Tutors = () => {
             render: (_, record) => (
                 <Space size="middle">
                     {record.status === "PENDING" ? (
-                        <>
+                        <div className="flex flex-row gap-2">
                             <Button
                                 color="primary"
                                 onClick={() => handleAccept(record.key)}
@@ -192,7 +192,7 @@ const Tutors = () => {
                                 onClick={() => handleReject(record.key)}
                                 style={{backgroundColor: '#f44336', borderColor: '#f44336', color: 'white'}}
                             >Reject</Button>
-                        </>
+                        </div>
                     ) : (
                         <Button danger onClick={() => showDeleteConfirm(record.key)}>Delete</Button>
                     )}
@@ -296,6 +296,7 @@ const Tutors = () => {
                         columns={columns}
                         dataSource={filteredData}
                         pagination={{pageSize: 5}}
+                        bordered
                     />
                 )}
             </div>

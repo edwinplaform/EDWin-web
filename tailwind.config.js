@@ -15,7 +15,7 @@ module.exports = {
       colors: {
         lightBlack : "#48466D",
         darkGreen: "#3D84A8",
-        bgColorWhite : "#F7F6F5",
+        bgColorWhite : "#F9F9FA",
         customLime:"#C9F0B7",
         customDarkGreen: "#00463A",
         customLightGreen: "#55ed47",
