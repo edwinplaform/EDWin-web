@@ -44,7 +44,7 @@ const AvailabilitySection = ({control, errors}) => {
             <p className="text-sm text-gray-500">Select your available days and times</p>
 
             <div className="my-4">
-                <h2 className="text-xs text-gray-600 mb-2">Available Days</h2>
+                <h2 className="text-xs text-gray-600 mb-2">Available Days*</h2>
                 <div className="flex flex-wrap gap-3">
                     <Controller
                         name="availability.days"

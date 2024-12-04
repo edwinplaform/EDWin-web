@@ -11,15 +11,14 @@ import Link from "next/link";
 import Upload from "@/components/Upload";
 import AvailabilitySection from "@/components/AvailabilitySection";
 import {useUser} from "@clerk/nextjs";
+import ProfilePicture from "@/components/ProfilePicture";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
     lastName: z.string().min(1, {message: "Last name is required!"}),
     phone: z.string().min(9, {message: "Valid phone number is required!"}),
     address: z.string().min(1, {message: "Address is required!"}),
-
     subjects: z.array(z.string().min(1, {message: "Subject is required!"})),
-    // email: z.string().email({message: "Valid email is required!"}),
     hourlyRate: z.coerce.number().min(1, {message: "Hourly rate is required!"}),
     qualifications: z.array(
         z.object({
@@ -45,17 +44,7 @@ const schema = z.object({
         endTime: z.string().min(1, {message: "End time is required!"}),
         preferredSlots: z.array(z.string()).optional(),
     }),
-
-    subject: z.string().min(1, {message: "Subject is required!"}),
-    email: z.string().email( {message: "Email is required!"}),
-    hourlyRate: z.number().min(1, {message: "Hourly rate is required!"}),
-    availableDate: z.date({message: "Available date is required!"}),
-    // qualifications: z.string().min(1, {chat: "Qualification is required!"}),
-    courseName:z.string().min(1, {message: "Course name is required!"}),
-    institute:z.string().min(1, {message: "Institute is required!"}),
     description: z.string().min(1, {message: "Description is required!"}),
-    certificate : z.instanceof(File,{message:"Document is required!"}),
-    currency: z.enum(["LKR","USD"],{message:"Currency is required!"}),
 })
 
 
@@ -119,6 +108,9 @@ const OnBoarding = () => {
                 isValid = await trigger(["subjects", "qualifications"]);
                 break;
             case 3:
+                isValid = await trigger(["description"]);
+                break;
+            case 4:
                 isValid = await trigger(["hourlyRate", "currency", "availability"]);
                 break;
             default:
@@ -146,7 +138,7 @@ const OnBoarding = () => {
             };
 
             console.log(submissionData);
-            setStep(4);
+            setStep(5);
         } catch (err) {
             console.log("------------submit err: ", err);
         }
@@ -158,18 +150,15 @@ const OnBoarding = () => {
     };
 
     return (
-        <div className="relative min-h-screen flex bg-customLime">
+        <div className="relative min-h-screen flex bg-gradient-to-r from-blue-500 to-purple-500">
             <div className="max-w-screen-xl mx-auto my-auto relative flex flex-col w-4/5">
-                {/*<div className="text-6xl font-BG  whitespace-pre-line text-center tracking-tighter">*/}
-                {/*    Project Planner*/}
-                {/*</div>*/}
                 {/*<div className="mt-4 w-full h-2" style={{backgroundColor: '#e0cfc8'}}>*/}
                 {/*    <div className="h-full bg-black rounded-3xl w-1/3"></div>*/}
                 {/*</div>*/}
                 <form onSubmit={handleSubmit(onSubmit, (errors) => {
                     console.error("---------------err: ", errors)
                 })}
-                      className="flex flex-col justify-center self-center gap-8 bg-white rounded-md h-4/5 w-4/5">
+                      className="flex flex-col justify-center self-center gap-8 bg-white rounded-lg shadow-lg h-4/5 w-4/5">
                     {step === 1 && (
                         <motion.div
                             key={step}
@@ -177,15 +166,13 @@ const OnBoarding = () => {
                             animate={{opacity: 1, y: 0}}
                             exit={{opacity: 0, y: -20}}
                             transition={{duration: 0.3}}
-                            className="md:w-3/5 mx-auto py-12 space-y-2">
+                            className="md:w-3/5 mx-auto py-12">
                             <div className="text-sm font-light text-gray-400 uppercase">
-                                Step 1 of 3
+                                Step 1 of 4
                             </div>
-                            <h1 className="text-lg font-bold">Profile Details</h1>
-                            <p className="text-sm text-gray-500">If you meet EDWin&apos;s minimum requirements, complete
-                                the registration form to register and proceed to create your profile on EDWin. Fields
-                                marked with * are required to be completed.</p>
-                            <div className="flex flex-col md:flex-row justify-between gap-4">
+                            <h1 className="text-lg font-bold my-2">Profile Details</h1>
+                            <p className="text-sm text-gray-500">Complete the registration form to create your profile on EDWin. Fields marked with * are required.</p>
+                            <div className="flex flex-col md:flex-row justify-between mt-4 gap-4">
                                 <InputField
                                     label="First name*"
                                     name="firstName"
@@ -199,26 +186,30 @@ const OnBoarding = () => {
                                     error={errors?.lastName}
                                 />
                             </div>
+                            <div className="my-4">
                             <InputField
                                 label="Phone number*"
                                 name="phone"
                                 register={register}
                                 error={errors?.phone}
                             />
+                            </div>
+                            <div className="my-4">
                             <InputField
                                 label="Address*"
                                 name="address"
                                 register={register}
                                 error={errors?.address}
                             />
+                            </div>
                             <hr/>
-                            <div className="flex flex-col md:flex-row gap-3 items-center">
+                            <div className="flex flex-col md:flex-row mt-4 gap-3 items-center">
                                 <input type="checkbox" id="check_1" required/>
                                 <label htmlFor="check_1" className="text-sm text-gray-600">I understand that my tutor
                                     registration will be reviewed
                                     by EDWin&apos;s support team, and I may need to provide more information.</label>
                             </div>
-                            <div className="flex flex-col md:flex-row gap-3 items-center">
+                            <div className="flex flex-col md:flex-row mt-4 gap-3 items-center">
                                 <input type="checkbox" id="check_2" required/>
                                 <label htmlFor="check_2" className="text-sm text-gray-600">I have not been convicted or
                                     accused of any crimes,
@@ -226,9 +217,9 @@ const OnBoarding = () => {
                                     them.</label>
                             </div>
 
-                            <div className="flex justify-end">
+                            <div className="flex mt-4 justify-end">
                                 <button type="button" onClick={nextStep}
-                                        className="mt-4 bg-black text-white font-bold py-2 px-4 rounded">
+                                        className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
                                     Next
                                 </button>
                             </div>
@@ -243,11 +234,8 @@ const OnBoarding = () => {
                             transition={{duration: 0.3}}
                             className="md:w-3/5 self-center py-12">
                             <div className="text-sm font-light text-gray-400 uppercase">
-                                Step 2 of 3
+                                Step 2 of 4
                             </div>
-                            {/*<div className="mt-4 w-full h-2" style={{backgroundColor: '#e0cfc8'}}>*/}
-                            {/*    <div className="h-full bg-black rounded-3xl w-2/3"></div>*/}
-                            {/*</div>*/}
                             <h1 className="text-lg font-bold mt-2">Subjects & Qualifications</h1>
                             <div className="my-6 mb-5">
                                 <h1 className="text-[14px] font-semibold">Subjects</h1>
@@ -265,7 +253,7 @@ const OnBoarding = () => {
                                             {subjectFields.length > 1 && (
                                                 <div
                                                     onClick={() => removeSubject(index)}
-                                                    className="px-2 py-1 bg-gray-200 rounded-full items-center self-end cursor-pointer"
+                                                    className="px-2 py-1 bg-red-200 rounded-full items-center self-end cursor-pointer hover:bg-red-300 transition duration-200"
                                                 >
                                                     <svg width="20" height="28" viewBox="0 0 24 24" fill="none"
                                                          xmlns="http://www.w3.org/2000/svg">
@@ -316,7 +304,7 @@ const OnBoarding = () => {
                                             {qualificationsFields.length > 1 && (
                                                 <div
                                                     onClick={() => removeQualification(index)}
-                                                    className="px-2 py-1 bg-gray-200 rounded-full items-center self-end cursor-pointer"
+                                                    className="px-2 py-1 bg-red-200 rounded-full items-center self-end cursor-pointer hover:bg-red-300 transition duration-200"
                                                 >
                                                     <svg width="20" height="28" viewBox="0 0 24 24" fill="none"
                                                          xmlns="http://www.w3.org/2000/svg">
@@ -359,15 +347,14 @@ const OnBoarding = () => {
                                     <p className="text-xs text-red-400">{errors.certificate.message.toString()}</p>
                                 )}
                             </div>
-
                             <div className="flex justify-between mt-12">
 
                                 <button type="button" onClick={prevStep}
-                                        className=" mr-4 bg-black text-white font-bold py-2 px-4 rounded">
+                                        className="mt-4 bg-gray-100 text-gray-600 font-bold py-2 px-4 rounded">
                                     Previous
                                 </button>
                                 <button type="button" onClick={nextStep}
-                                        className=" bg-black text-white font-bold py-2 px-4 rounded">
+                                        className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
                                     Next
                                 </button>
                             </div>
@@ -380,9 +367,47 @@ const OnBoarding = () => {
                             animate={{opacity: 1, y: 0}}
                             exit={{opacity: 0, y: -20}}
                             transition={{duration: 0.3}}
+                            className="md:w-3/5 w-3/5 mx-auto py-12">
+                            <div className="text-sm font-light text-gray-400 uppercase">
+                                Step 3 of 4
+                            </div>
+                            <h1 className="text-lg font-bold mt-2">Public Profile</h1>
+                            <p className="text-sm text-gray-500">Now create your public profile which will be shown to
+                                prospective students on EDWin.</p>
+                            <div className="my-6 mb-5">
+                                <h1 className="text-xs text-gray-500">Add display picture*</h1>
+                                <ProfilePicture/>
+                                <div className="flex flex-col gap-2 w-full">
+                                    <label htmlFor="description" className="text-xs text-gray-500">Tell the world
+                                        about*</label>
+                                    <textarea id="description" rows={5} {...register("description")}
+                                              className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"/>
+                                    {errors?.description && (
+                                        <p className="text-xs text-red-400">{errors.description.message.toString()}</p>)}
+                                </div>
+                            </div>
+                            <div className="flex justify-between mt-12">
+                                <button type="button" onClick={prevStep}
+                                        className="mt-4 bg-gray-100 text-gray-600 font-bold py-2 px-4 rounded">
+                                    Previous
+                                </button>
+                                <button type="button" onClick={nextStep}
+                                        className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
+                                    Next
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                    {step === 4 && (
+                        <motion.div
+                            key={step}
+                            initial={{opacity: 0, y: 20}}
+                            animate={{opacity: 1, y: 0}}
+                            exit={{opacity: 0, y: -20}}
+                            transition={{duration: 0.3}}
                             className="md:w-3/5 mx-auto py-12">
                             <div className="text-sm font-light text-gray-400 uppercase">
-                                Step 3 of 3
+                                Step 4 of 4
                             </div>
                             <h1 className="text-lg font-bold mt-2">Rates & Availability</h1>
                             <div className="my-6 mb-5">
@@ -414,17 +439,17 @@ const OnBoarding = () => {
                             <AvailabilitySection control={control} errors={errors}/>
                             <div className="flex justify-between mt-12">
                                 <button type="button" onClick={prevStep}
-                                        className=" mr-4 bg-black text-white font-bold py-2 px-4 rounded">
+                                        className="mt-4 bg-gray-100 text-gray-600 font-bold py-2 px-4 rounded">
                                     Previous
                                 </button>
                                 <button type="submit"
-                                        className=" bg-black text-white font-bold py-2 px-4 rounded">
+                                        className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
                                     Submit
                                 </button>
                             </div>
                         </motion.div>
                     )}
-                    {step === 4 && (
+                    {step === 5 && (
                         <motion.div
                             key={step}
                             initial={{opacity: 0, y: 20}}
@@ -442,7 +467,7 @@ const OnBoarding = () => {
                                 <div className="flex justify-center mt-12">
                                     <Link href="/portal/tutors">
                                         <button type="button"
-                                                className=" bg-black text-white font-bold py-2 px-4 rounded">
+                                                className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
                                             Close
                                         </button>
                                     </Link>

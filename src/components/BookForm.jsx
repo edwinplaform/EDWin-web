@@ -100,12 +100,13 @@ const BookForm = () => {
                     <Form.Item
                         name="grade"
                         label="Grade"
-                        rules={[{required: true, message: "Please select a grade!"}]}
+                        rules={[{required: true, message: "Please enter your grade!"}]}
                     >
-                        <Select placeholder="Select your grade">
-                            <Option value="12">Grade 12</Option>
-                            <Option value="13">Grade 13</Option>
-                        </Select>
+                        {/*<Select placeholder="Select your grade">*/}
+                        {/*    <Option value="12">Grade 12</Option>*/}
+                        {/*    <Option value="13">Grade 13</Option>*/}
+                        {/*</Select>*/}
+                        <Input placeholder="Enter your grade"/>
                     </Form.Item>
                     <Form.Item
                         name="comment"

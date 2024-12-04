@@ -10,49 +10,74 @@ const Appointments = () => {
     const [appointments, setAppointments] = useState([
         {
             appointment_id: 1,
-            proposed_date: '2023-10-10',
-            start_time: '10:00:00',
-            end_time: '11:00:00',
-            status: 'PENDING',
-            proposed_rate: 50.00,
-            notes: 'Looking forward to the session.',
+            student_name: "Amal",
+            proposed_day: "Monday",
+            subject: "Physics",
+            grade: 12,
+            start_time: '09:00:00',
+            status: "PENDING",
+            notes: 'Discussing advanced topics.'
         },
         {
             appointment_id: 2,
-            proposed_date: '2023-10-16',
-            start_time: '14:00:00',
-            end_time: '15:00:00',
-            status: 'CONFIRMED',
-            proposed_rate: 60.00,
-            notes: 'Discussing advanced topics.',
+            student_name: "Sara",
+            proposed_day: "Tuesday",
+            subject: "Mathematics",
+            grade: 11,
+            start_time: '10:30:00',
+            status: "CONFIRMED",
+            notes: 'Reviewing calculus concepts.'
         },
         {
             appointment_id: 3,
-            proposed_date: '2023-10-17',
-            start_time: '09:00:00',
-            end_time: '10:00:00',
-            status: 'REJECTED',
-            proposed_rate: 55.00,
-            notes: 'Student canceled the appointment.',
+            student_name: "John",
+            proposed_day: "Wednesday",
+            subject: "Chemistry",
+            grade: 10,
+            start_time: '14:00:00',
+            status: "CANCELLED",
+            notes: 'Need to reschedule due to a conflict.'
         },
         {
             appointment_id: 4,
-            proposed_date: '2023-10-18',
+            student_name: "Emily",
+            proposed_day: "Thursday",
+            subject: "Biology",
+            grade: 12,
             start_time: '11:00:00',
-            end_time: '12:00:00',
-            status: 'PENDING',
-            proposed_rate: 70.00,
-            notes: 'Need to cover the syllabus.',
+            status: "PENDING",
+            notes: 'Preparing for the upcoming exam.'
         },
         {
             appointment_id: 5,
-            proposed_date: '2023-10-19',
-            start_time: '13:00:00',
-            end_time: '14:00:00',
-            status: 'CONFIRMED',
-            proposed_rate: 65.00,
-            notes: 'Reviewing previous topics.',
+            student_name: "Michael",
+            proposed_day: "Friday",
+            subject: "English Literature",
+            grade: 11,
+            start_time: '15:00:00',
+            status: "COMPLETED",
+            notes: 'Discussing the themes of the latest novel.'
         },
+        {
+            appointment_id: 6,
+            student_name: "Sophia",
+            proposed_day: "Saturday",
+            subject: "History",
+            grade: 10,
+            start_time: '13:00:00',
+            status: "PENDING",
+            notes: 'Exploring World War II events.'
+        },
+        {
+            appointment_id: 7,
+            student_name: "David",
+            proposed_day: "Sunday",
+            subject: "Computer Science",
+            grade: 12,
+            start_time: '16:00:00',
+            status: "CONFIRMED",
+            notes: 'Working on the final project.'
+        }
     ]);
 
     const columns = [
@@ -62,21 +87,35 @@ const Appointments = () => {
             key: 'appointment_id',
         },
         {
-            title: 'Proposed Date',
-            dataIndex: 'proposed_date',
-            key: 'proposed_date',
-            render: (text) => new Date(text).toLocaleDateString(),
+            title: 'Student Name',
+            dataIndex: 'student_name',
+            key: 'student_name',
+        },
+        {
+            title: 'Proposed Day',
+            dataIndex: 'proposed_day',
+            key: 'proposed_day',
+        },
+        {
+            title: 'Subject',
+            dataIndex: 'subject',
+            key: 'subject',
+        },
+        {
+            title: 'Grade',
+            dataIndex: 'grade',
+            key: 'grade',
         },
         {
             title: 'Start Time',
             dataIndex: 'start_time',
             key: 'start_time',
         },
-        {
-            title: 'End Time',
-            dataIndex: 'end_time',
-            key: 'end_time',
-        },
+        // {
+        //     title: 'End Time',
+        //     dataIndex: 'end_time',
+        //     key: 'end_time',
+        // },
         {
             title: 'Status',
             dataIndex: 'status',
@@ -97,12 +136,12 @@ const Appointments = () => {
                 );
             }
         },
-        {
-            title: 'Proposed Rate',
-            dataIndex: 'proposed_rate',
-            key: 'proposed_rate',
-            render: (text) => `$${text.toFixed(2)}`,
-        },
+        // {
+        //     title: 'Proposed Rate',
+        //     dataIndex: 'proposed_rate',
+        //     key: 'proposed_rate',
+        //     render: (text) => `$${text.toFixed(2)}`,
+        // },
         {
             title: 'Notes',
             dataIndex: 'notes',
@@ -115,7 +154,7 @@ const Appointments = () => {
             render: (_, record) => (
                 <Space size="middle">
                     {record.status === "PENDING" ? (
-                        <>
+                        <div className="flex gap-3">
                             <Button type="primary"
                                     onClick={() => confirmAppointment(record.appointment_id)}
                                     style={{backgroundColor: '#4CAF50', borderColor: '#4CAF50', color: 'white'}}
@@ -124,7 +163,7 @@ const Appointments = () => {
                                     onClick={() => openRejectionModal(record.appointment_id)}
                                     style={{backgroundColor: '#f44336', borderColor: '#f44336', color: 'white'}}
                             >Reject</Button>
-                        </>
+                        </div>
                     ) : (
                         <Button danger onClick={() => showDeleteConfirm(record.appointment_id)}>Delete</Button>
                     )}
@@ -195,6 +234,7 @@ const Appointments = () => {
                 appointment.appointment_id === appointmentId ? {...appointment, status: "REJECTED"} : appointment
             ));
             message.success(`Appointment ID: ${appointmentId} has been rejected.`);
+            console.log(rejectionReason);
             setIsRejectionModalVisible(false);
             setRejectionReason('');
         } catch (err) {
