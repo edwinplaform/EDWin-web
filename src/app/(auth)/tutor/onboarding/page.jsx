@@ -12,6 +12,7 @@ import Upload from "@/components/Upload";
 import AvailabilitySection from "@/components/AvailabilitySection";
 import {useUser} from "@clerk/nextjs";
 import ProfilePicture from "@/components/ProfilePicture";
+import {role} from "@/util/Role";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
@@ -135,6 +136,7 @@ const OnBoarding = () => {
                 createdAt: new Date(),
                 status: 'pending',
                 userId: userId,
+                role: role(user),
             };
 
             console.log(submissionData);

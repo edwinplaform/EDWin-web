@@ -9,6 +9,7 @@ import {useUser} from "@clerk/nextjs";
 import {z} from "zod";
 import Image from "next/image";
 import Link from "next/link";
+import {role} from "@/util/Role";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
@@ -76,6 +77,7 @@ const StudentOnboarding = () => {
                 ...data,
                 createdAt: new Date(),
                 userId: userId,
+                role: role(user)
             };
 
             console.log(submissionData);

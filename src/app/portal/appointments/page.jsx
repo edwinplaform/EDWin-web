@@ -6,75 +6,82 @@ import TableSearch from "@/components/TableSearch";
 const {Title} = Typography;
 
 const Appointments = () => {
-    // Temporary data for appointments
+
     const [appointments, setAppointments] = useState([
         {
             appointment_id: 1,
             student_name: "Amal",
-            proposed_day: "Monday",
+            date: "2024-12-29",
             subject: "Physics",
             grade: 12,
-            start_time: '09:00:00',
+            start_time: '09:00',
+            end_time: '17:00',
             status: "PENDING",
             notes: 'Discussing advanced topics.'
         },
         {
             appointment_id: 2,
             student_name: "Sara",
-            proposed_day: "Tuesday",
+            date: "2024-12-29",
             subject: "Mathematics",
             grade: 11,
-            start_time: '10:30:00',
+            start_time: '10:30',
+            end_time: '17:00',
             status: "CONFIRMED",
             notes: 'Reviewing calculus concepts.'
         },
         {
             appointment_id: 3,
             student_name: "John",
-            proposed_day: "Wednesday",
+            date: "2024-12-29",
             subject: "Chemistry",
             grade: 10,
-            start_time: '14:00:00',
-            status: "CANCELLED",
+            start_time: '14:00',
+            end_time: '17:00',
+            status: "REJECTED",
             notes: 'Need to reschedule due to a conflict.'
         },
         {
             appointment_id: 4,
             student_name: "Emily",
-            proposed_day: "Thursday",
+            date: "2024-12-29",
             subject: "Biology",
             grade: 12,
-            start_time: '11:00:00',
+            start_time: '11:00',
+            end_time: '17:00',
             status: "PENDING",
             notes: 'Preparing for the upcoming exam.'
         },
         {
             appointment_id: 5,
             student_name: "Michael",
-            proposed_day: "Friday",
+            date: "2024-12-29",
             subject: "English Literature",
             grade: 11,
-            start_time: '15:00:00',
-            status: "COMPLETED",
+            start_time: '15:00',
+            end_time: '17:00',
+            status: "CONFIRMED",
             notes: 'Discussing the themes of the latest novel.'
         },
         {
             appointment_id: 6,
             student_name: "Sophia",
-            proposed_day: "Saturday",
+            date: "2024-12-29",
             subject: "History",
             grade: 10,
-            start_time: '13:00:00',
+            start_time: '13:00',
+            end_time: '17:00',
             status: "PENDING",
             notes: 'Exploring World War II events.'
         },
         {
             appointment_id: 7,
             student_name: "David",
-            proposed_day: "Sunday",
+            date: "2024-12-29",
             subject: "Computer Science",
             grade: 12,
-            start_time: '16:00:00',
+            start_time: '16:00',
+            end_time: '17:00',
             status: "CONFIRMED",
             notes: 'Working on the final project.'
         }
@@ -92,9 +99,9 @@ const Appointments = () => {
             key: 'student_name',
         },
         {
-            title: 'Proposed Day',
-            dataIndex: 'proposed_day',
-            key: 'proposed_day',
+            title: 'Date',
+            dataIndex: 'date',
+            key: 'date',
         },
         {
             title: 'Subject',
@@ -107,15 +114,11 @@ const Appointments = () => {
             key: 'grade',
         },
         {
-            title: 'Start Time',
-            dataIndex: 'start_time',
-            key: 'start_time',
+            title: 'Time',
+            dataIndex: 'time',
+            key: 'time',
+            render: (_, session) => `${session.start_time} - ${session.end_time}`
         },
-        // {
-        //     title: 'End Time',
-        //     dataIndex: 'end_time',
-        //     key: 'end_time',
-        // },
         {
             title: 'Status',
             dataIndex: 'status',
