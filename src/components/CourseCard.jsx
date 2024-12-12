@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const CourseCard = ({id,name,title,grade,price,image}) => {
     return(
-        <div className="block rounded-lg border m-4 p-2 shadow-sm w-1/6 sm:w-1/6 shadow-indigo-400 hover:shadow-2xl">
+        <div className="block rounded-lg border m-4 p-2 shadow-sm w-1/6 sm:w-1/3 shadow-indigo-400 hover:shadow-2xl">
             <Link href="#">
                 <Image
                     src= {image}
@@ -16,7 +16,7 @@ const CourseCard = ({id,name,title,grade,price,image}) => {
 
                     <div className="flex flex-row gap-3">
                             <Image
-                                src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                src="https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?cs=srgb&dl=pexels-stefanstefancik-91227.jpg&fm=jpg&_gl=1*1otv2gb*_ga*MTg2Njc3MjIyMS4xNzMzNzM0ODU3*_ga_8JE65Q40S6*MTczMzczNDg1Ny4xLjEuMTczMzczNTMxMC4wLjAuMA.."
                                 alt="user"
                                 width={30}
                                 height={30}
@@ -29,7 +29,7 @@ const CourseCard = ({id,name,title,grade,price,image}) => {
                     </div>
 
                     <div className="flex justify-between mt-2">
-                        <p className="text-sm text-gray-500 font-semibold">Grade {grade}</p>
+                        <p className="text-sm text-gray-500 font-semibold">{grade}</p>
                         <p className="text-sm text-gray-500 ">Rs.{price}</p>
                     </div>
                 </div>

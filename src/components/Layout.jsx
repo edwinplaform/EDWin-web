@@ -1,19 +1,19 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import {currentUser} from "@clerk/nextjs/server";
+import { useUser } from "@clerk/nextjs";
 
-const Layout = async ({ children }) => {
-    const user = await currentUser();
+const Layout = ({ children }) => {
+    const { isSignedIn, user } = useUser();
 
     return (
         <>
-            {!user &&
-            <Navbar/> }
+            {!isSignedIn && <Navbar />}
             {children}
-            {!user &&
-            <Footer/> }
+            {!isSignedIn && <Footer />}
         </>
-    )
-}
+    );
+};
 
 export default Layout;
