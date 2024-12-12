@@ -1,151 +1,132 @@
 import Image from "next/image";
 import BookForm from "@/components/BookForm";
 import Reviews from "@/components/Reviews";
+import {currentUser} from "@clerk/nextjs/server";
+import Nav from "@/components/Nav";
 
-const tutor = () => {
+const Tutor = () => {
+    const user = currentUser();
+
     return (
-        <div className="bg-bgColorWhite mx-auto py-4 px-10">
-            <div className="flex">
-                <div className="w-2/3 p-8 rounded-lg ">
-                    <div className="flex">
+        <>
+            {user && <Nav/>}
+            <div className="bg-bgColorWhite">
+                <div className="max-w-4xl mx-auto  p-4">
+                    <div className="bg-white rounded-xl p-6 flex flex-col md:flex-row items-center mt-6">
                         <Image src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg" alt=""
-                               className="w-80 h-80 rounded-full mr-6" height={150} width={150}/>
-                        <div className="px-6">
-                            <h1 className="text-7xl font-bold  text-customDarkGreen">
-                                AMAL
-                            </h1>
-                            <div className="flex space-x-2 mt-3">
-                                <span className="bg-white text-gray-700 py-1 px-3 rounded-full">
-                                    Maths
-                                </span>
-                                <span className="bg-white text-gray-700 py-1 px-3 rounded-full">
-                                    Science
-                                </span>
-                                <span className="bg-white text-gray-700 py-1 px-3 rounded-full">
-                                    History
-                                </span>
-                            </div>
-                            <div className="mt-6">
-                                <div className="flex items-center my-3">
-                                    <div className="p-2 bg-customLime rounded-xl mr-2">
-                                        <Image src="/star1.svg" alt="star" height={18} width={18}/>
-                                    </div>
-                                    <p className="text-sm">5.0 (25 reviews)</p>
-                                </div>
-                                <div className="flex items-center my-3">
-                                    <div className="p-2 bg-customLime rounded-xl mr-2">
-                                        <Image src="/check.svg" alt="star" height={18} width={18}/>
-                                    </div>
-                                    <p className="text-sm">Background check</p>
-                                </div>
-                                <div className="flex items-center my-3">
-                                    <div className="p-2 bg-customLime rounded-xl mr-2">
-                                        <Image src="/map.svg" alt="star" height={18} width={18}/>
-                                    </div>
-                                    <p className="sm">Online Tutor</p>
-                                </div>
-                                <div className="flex items-center my-3">
-                                    <div className="p-2 bg-customLime rounded-xl mr-2">
-                                        <Image src="/calendar.svg" alt="star" height={18} width={18}/>
-                                    </div>
-                                    <p className="text-sm">On EDWin since September {"'24"}</p>
-                                </div>
-                                <div className="flex items-center my-3">
-                                    <div className="p-2 bg-customLime rounded-xl mr-2">
-                                        <Image src="/chat.svg" alt="star" height={18} width={18}/>
-                                    </div>
-                                    <p className="text-sm">Replies in 10 minutes</p>
+                               width={200} height={200} className="rounded-md h-32 w-32 md:w-64 md:h-64"/>
+                        <div className="md:ml-6 mt-4 md:mt-0 text-center md:text-left">
+                            <div className="flex gap-10">
+                                <div className="text-2xl text-[#275e6c] font-bold">Amal Perera</div>
+                                <div className="flex items-center justify-center md:justify-start mt-1">
+                                    <Image src="/rateStar.png" alt="" height={20} width={20}/>
+                                    <span className="ml-1 text-gray-600">5.0 (10)</span>
                                 </div>
                             </div>
-
-                        </div>
-                    </div>
-                    <div className="mt-6 bg-customLime p-4 rounded-3xl">
-                        <h2 className="text-xl font-bold text-gray-700">
-                            About Amal
-                        </h2>
-                        <p className="mt-6 text-xl text-gray-900">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras et erat ac ligula pellentesque
-                            dictum. Vivamus lacus urna, auctor quis laoreet et, facilisis id libero. Phasellus at massa
-                            ut risus euismod convallis. Aenean viverra libero mi, eget mollis nulla lobortis quis. Sed
-                            hendrerit sollicitudin urna vitae dapibus. Mauris a sem turpis. Donec eleifend egestas quam,
-                            tincidunt eleifend sem malesuada laoreet.
-
-                            Morbi volutpat tempus dui, vel accumsan diam iaculis id. Praesent vestibulum, enim in
-                            commodo lobortis, purus ante laoreet nulla, sit amet maximus est diam nec diam. Suspendisse
-                            sit amet ornare turpis, vel mattis risus. Integer vel nisl risus. Cras elit purus, eleifend
-                            non orci et, porttitor sodales risus. Orci varius natoque penatibus et magnis dis parturient
-                            montes, nascetur ridiculus mus. Morbi dui nisi, feugiat nec nisl vitae, accumsan blandit
-                            enim. Mauris varius placerat lobortis. Donec volutpat fermentum erat, sed luctus justo
-                            volutpat sed.
-                        </p>
-                    </div>
-                    <div className="flex justify-center items-center mt-8">
-                        <div className="bg-white rounded-3xl shadow-lg w-full">
-                            <h1 className="text-2xl font-bold text-customDarkGreen opacity-60 my-6 px-6">Qualifications</h1>
-                                <div className="bg-bgColorWhite p-10 m-6 rounded-3xl">
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold text-customDarkGreen mb-1">University of
-                                            oxford</h2>
-                                        <div className="mb-5">
-                                            <p className="">Mathematics- First class Honours Degree</p>
-                                        </div>
-                                    </div>
-                                    <hr className="mb-6"/>
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold text-customDarkGreen mb-1">University of
-                                            oxford</h2>
-                                        <div className="mb-5">
-                                            <p className="">Mathematics- First class Honours Degree</p>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div className="flex gap-2 mt-4 justify-center md:justify-start opacity-70">
+                                <Image src="/calendar.png" alt="" width={18} height={14}/>
+                                <span
+                                    className="text-gray-600 text-[14px]">On EDWin since October &apos;s22</span>
                             </div>
-                        </div>
-                        <div className="">
-                            <div className="flex justify-center items-center mt-8">
-                                <div className="bg-white rounded-3xl shadow-lg w-full">
-                                    <div className="px-6 my-6">
-                                        <h1 className="text-2xl font-bold text-customDarkGreen opacity-60">Reviews</h1>
-                                        <p className="text-sm text-customDarkGreen opacity-40">5.0 (25 reviews)</p>
-                                </div>
-                                <div className="bg-bgColorWhite p-10 m-6 rounded-3xl">
-                                    <Reviews/>
-                                    <hr className="mb-6"/>
-                                    <Reviews/>
-                                </div>
+                            <div className="flex gap-2 mt-2 justify-center md:justify-start">
+                                <Image src="/dollarSymbol.png" alt="" height={18} width={18}/>
+                                <span className="text-gray-700 text-[14px]">From <span
+                                    className="font-bold"><b>$55.00</b></span> + GST</span>
                             </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div className="w-1/3 ml-6">
-                    <div className="bg-white p-6 rounded-3xl shadow-lg">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <span className="text-5xl font-bold text-green-600">
-                                    Rs.1000
-                                </span>
-                                <span className="text-gray-700 self-end px-2">
-                                    per hour
-                                </span>
-                            </div>
-                            <div className="p-4 bg-customLime rounded-full flex">
-                                <Image src="/star1.svg" alt="star" width="20" height="20"/>
-                                <span className="ml-2 text-customDarkGreen font-bold">5.0</span>
-                            </div>
-                        </div>
-                        <div className="mt-8">
-                            <h3 className="text-lg font-bold text-gray-900">Online Lessons</h3>
-                            <div className="mt-4 space-y-4">
+                            <div className="justify-center md:justify-start">
                                 <BookForm/>
                             </div>
                         </div>
                     </div>
+                    <div className="mt-10">
+                        <h2 className="text-[#275e6c] text-xl font-bold">About Amal</h2>
+                        <div className="bg-white rounded-xl shadow-sm p-6 mt-4">
+                            <p className="mt-4 text-gray-800 text-[15px]">
+                                Hi, Thanks for your time to view my profile. I have completed a double degree in
+                                University of Adelaide and my degrees are Engineering and Mathematics Science.
+                                I am currently a PhD Student in Applied Mathematics at The University of Adelaide.
+                                I love mathematics not only because it is essential for solving problems but also helps
+                                to improve the analytically thinking and it refers to the ability to think critically
+                                about the world around us. “Maths is the mother of science” .
+                                This is why I am interested in maths and chose this as my degree.
+                                I started tutoring when I was high school, it was helping my classmates on a mathematics
+                                assignment. I still remember how happy he was after solving the toughest question in the
+                                assignment. I felt valuable and satisfied because of the help I provided.
+                                I am a friendly patient person benefiting from this I am able to truly understand what
+                                the students need and provide clear and easy explanations. When I help students I would
+                                like to guide them to solving problems in their own ways rather than showing them my
+                                solutions.
+                                ”Give a man a fish and you feed him for a day; teach a man to fish and you feed him for
+                                a lifetime.”
+                            </p>
+                        </div>
+                    </div>
+                    <div className="mt-10">
+                        <h2 className="text-[#275e6c] text-xl font-bold">Subjects Amal currently offers tutoring
+                            for</h2>
+                        <div className="bg-white rounded-xl shadow-sm p-6 mt-4">
+                            <p className="text-gray-700 mb-3 font-semibold text-sm">I currently offer tutoring for :</p>
+                            <div className="flex flex-wrap gap-2 opacity-80 mb-2">
+                                <span
+                                    className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold text-sm">Mathematics</span>
+                                <span
+                                    className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold text-sm">Physics</span>
+                                <span
+                                    className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold text-sm">Chemistry</span>
+                                <span
+                                    className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold text-sm">Biology</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-10">
+                        <h2 className="text-[#275e6c] text-xl font-bold">Hourly Rates</h2>
+                        <div className="bg-white p-6 rounded-xl shadow-sm mt-4">
+                            <div className="flex justify-start gap-16 items-center text-[15px] mb-4">
+                                <p className="text-gray-800 font-semibold">1-On-1 rate</p>
+                                <p className="text-gray-800">$50.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-10">
+                        <h2 className="text-xl text-[#275e6c] font-bold">Availability</h2>
+                        <div className="bg-white p-6 rounded-xl shadow-sm mt-4">
+                            <div className="flex justify-start gap-16 items-center text-[15px] mb-4">
+                                <p className="text-gray-800 font-semibold">Availability</p>
+                                <div className="flex flex-col">
+                                    <div className="flex flex-row text-gray-800 gap-4">
+                                        <p>Monday</p>
+                                        <p>4:00 PM - 9:00 PM</p>
+                                    </div>
+                                    <div className="flex flex-row text-gray-800 gap-4">
+                                        <p>Monday</p>
+                                        <p>4:00 PM - 9:00 PM</p>
+                                    </div>
+                                    <div className="flex flex-row text-gray-800 gap-4">
+                                        <p>Monday</p>
+                                        <p>4:00 PM - 9:00 PM</p>
+                                    </div>
+                                    <div className="flex flex-row text-gray-800 gap-4">
+                                        <p>Monday</p>
+                                        <p>4:00 PM - 9:00 PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-10 mb-20">
+                        <h2 className="text-xl text-[#275e6c] font-bold">Reviews</h2>
+                        <p className="text-sm text-gray-500">5.0 (25 reviews)</p>
+                        <div className="bg-white p-6 rounded-xl shadow-sm mt-4">
+                            <Reviews/>
+                            <hr className="mb-6"/>
+                            <Reviews/>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    )
-}
 
-export default tutor;
+            </div>
+        </>
+    );
+};
+
+export default Tutor;

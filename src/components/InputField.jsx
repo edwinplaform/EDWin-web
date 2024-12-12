@@ -1,0 +1,13 @@
+const InputField = ({label, type = "text", register, name, error, inputProps}) => {
+    return (
+        <div className="flex flex-col gap-2 w-full">
+            <label htmlFor={name} className="text-xs text-gray-500">{label}</label>
+            <input id={name} type={type} {...register(name)}
+                   className="ring-[1.5px] ring-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 p-2 rounded-md text-sm w-full" {...inputProps} />
+            {error?.message && (
+                <p className="text-xs text-red-400">{error.message.toString()}</p>)}
+        </div>
+    );
+};
+
+export default InputField;
