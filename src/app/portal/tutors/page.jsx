@@ -3,98 +3,112 @@
 import TableSearch from "@/components/TableSearch";
 import {Button, message, Modal, Space, Spin, Table, Tag} from "antd";
 import {useEffect, useState} from "react";
-// import {fetchTutors, deleteTutor} from "@/services/tutorService";
-
+import {useDeleteUser, useUpdateTutorStatus, useUsers} from "@/hooks/useUsers";
 
 const Tutors = () => {
 
-    const [data, setData] = useState([
-        {
-            key: '1',
-            name: 'John Brown',
-            phone: '0123456789',
-            address: 'New York No. 1 Lake Park',
-            subjects: ["Sinhala", "History"],
-            qualifications: [
-                {course: "Bachelor of Arts in Sinhala", institute: "University of Colombo"},
-                {course: "Master of History", institute: "University of Peradeniya"}
-            ],
-            rate: "$25/hour",
-            certificate: "https://example.com/certificate1",
-            status: "PENDING"
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            phone: '0123456789',
-            address: 'Los Angeles No. 2 Lake Park',
-            subjects: ["Mathematics", "Physics"],
-            qualifications: [
-                {course: "Bachelor of Science in Mathematics", institute: "California Institute of Technology"},
-                {course: "Master of Science in Physics", institute: "Stanford University"}
-            ],
-            rate: "$30/hour",
-            certificate: "https://example.com/certificate2",
-            status: "PENDING"
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            phone: '0123456789',
-            address: 'Chicago No. 3 Lake Park',
-            subjects: ["English", "Literature"],
-            qualifications: [
-                {course: "Bachelor of Arts in English Literature", institute: "Harvard University"},
-                {course: "Master of Arts in English", institute: "Yale University"}
-            ],
-            rate: "$28/hour",
-            certificate: "https://example.com/certificate3",
-            status: "PENDING"
-        },
-        {
-            key: '4',
-            name: 'Alice Smith',
-            phone: '0123456789',
-            address: 'Houston No. 4 Lake Park',
-            subjects: ["Biology", "Chemistry"],
-            qualifications: [
-                {course: "Bachelor of Science in Biology", institute: "University of Texas"},
-                {course: "PhD in Chemistry", institute: "MIT"}
-            ],
-            rate: "$35/hour",
-            certificate: "https://example.com/certificate4",
-            status: "PENDING"
-        },
-        {
-            key: '5',
-            name: 'Bob Johnson',
-            phone: '0123456789',
-            address: 'Phoenix No. 5 Lake Park',
-            subjects: ["Computer Science", "Programming"],
-            qualifications: [
-                {course: "Bachelor of Science in Computer Science", institute: "University of Arizona"},
-                {course: "Master of Science in Software Engineering", institute: "University of California"}
-            ],
-            rate: "$40/hour",
-            certificate: "https://example.com/certificate5",
-            status: "PENDING"
-        },
-        {
-            key: '6',
-            name: 'Emma Wilson',
-            phone: '0123456789',
-            address: 'Philadelphia No. 6 Lake Park',
-            subjects: ["Art", "Design"],
-            qualifications: [
-                {course: "Bachelor of Fine Arts", institute: "Rhode Island School of Design"},
-                {course: "Master of Arts in Design", institute: "Savannah College of Art and Design"}
-            ],
-            rate: "$32/hour",
-            certificate: "https://example.com/certificate6",
-            status: "PENDING"
-        },
-    ]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
+    const [selectedTutorKey, setSelectedTutorKey] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [tutorToReject, setTutorToReject] = useState(null);
 
+    const {data: tutors, isLoading, error} = useUsers("TUTOR");
+
+    const deleteUserMutation = useDeleteUser();
+    const updateTutorStatusMutation = useUpdateTutorStatus();
+
+    const transformedData = tutors?.data.map(tutor => ({
+        key: tutor.userId,
+        name: `${tutor.firstName} ${tutor.lastName}`,
+        phone: tutor.phone,
+        address: tutor.address,
+        subjects: tutor.Tutor.subjects,
+        qualifications: tutor.Tutor.qualifications,
+        rate: `${tutor.Tutor.hourlyRate} ${tutor.Tutor.currency}/hour`,
+        certificate: tutor.Tutor.certificateUrl,
+        status: tutor.Tutor.status,
+    }));
+
+    console.log("------Transformed Data:", transformedData);
+    console.error("-------Error updating tutor status:", error);
+
+
+    const handleSearch = (value) => {
+        setSearchTerm(value);
+    };
+
+    const filteredData = transformedData?.filter(tutor =>
+        tutor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tutor.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tutor.phone.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const showDeleteConfirm = (key) => {
+        setSelectedTutorKey(key);
+        setIsModalVisible(true)
+    }
+
+    const showRejectConfirm = (userId) => {
+        console.log("Showing reject confirmation for ID:", userId);
+        setTutorToReject(userId);
+        setIsRejectModalVisible(true);
+    };
+
+    const handleAccept = (userId) => {
+        console.log("Accepting tutor with ID:", userId);
+        updateTutorStatusMutation.mutate({userId: userId, data: {status: "ACCEPTED"}}, {
+            onSuccess: () => {
+                message.success('Tutor request accepted successfully!');
+            },
+            onError: () => {
+                console.error("Error accepting tutor:", error);
+                message.error('Failed to accept tutor request.');
+            }
+        });
+    };
+
+    const handleReject = () => {
+        if (tutorToReject) {
+            console.log("Rejecting tutor with ID:", tutorToReject);
+            updateTutorStatusMutation.mutate({userId: tutorToReject, data: {status: "REJECTED"}}, {
+                onSuccess: () => {
+                    message.success('Tutor request rejected successfully!');
+                    setIsRejectModalVisible(false);
+                    setTutorToReject(null);
+                },
+                onError: () => {
+                    console.error("Error rejecting tutor:", error);
+                    message.error('Failed to reject tutor request.');
+                }
+            });
+        } else {
+            console.error('Invalid tutor ID. tutorToReject is null.');
+            message.error('Invalid tutor ID.');
+        }
+    };
+
+    const handleDelete = () => {
+        try {
+            // setData(data.filter(tutor => tutor.key !== selectedTutorKey));
+            message.success('Tutor request deleted successfully!');
+        } catch (err) {
+            message.error("Failed to delete tutors.");
+        } finally {
+            setIsModalVisible(false);
+            setSelectedTutorKey(null);
+        }
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        setSelectedTutorKey(null);
+    };
+
+    const handleRejectCancel = () => {
+        setIsRejectModalVisible(false);
+        setTutorToReject(null);
+    };
 
     const columns = [
         {
@@ -134,8 +148,8 @@ const Tutors = () => {
             render: (_, {qualifications}) => (
                 <>
                     {qualifications.map((qualification) => (
-                        <div key={qualification.course} className="pb-2">
-                            <p className="font-semibold">{qualification.course}</p>
+                        <div key={qualification.courseName} className="pb-2">
+                            <p className="font-semibold">{qualification.courseName}</p>
                             <p>{qualification.institute}</p>
                         </div>
                     ))}
@@ -152,7 +166,7 @@ const Tutors = () => {
             dataIndex: "certificate",
             key: "certificate",
             render: (_, {certificate}) => (
-                <a href="https://www.youtube.com/" target="_blank">View Certificate</a>
+                <a href={certificate} target="_blank" rel="noopener noreferrer">View Certificate</a>
             )
         },
         {
@@ -189,7 +203,7 @@ const Tutors = () => {
                             >Accept</Button>
                             <Button
                                 color="default"
-                                onClick={() => handleReject(record.key)}
+                                onClick={() => showRejectConfirm(record.key)}
                                 style={{backgroundColor: '#f44336', borderColor: '#f44336', color: 'white'}}
                             >Reject</Button>
                         </div>
@@ -201,75 +215,6 @@ const Tutors = () => {
         },
     ];
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedTutorKey, setSelectedTutorKey] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [loading, setLoading] = useState(false);
-
-    // const loadTutors = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const tutors = await fetchTutors();
-    //         setData(tutors);
-    //     } catch (error) {
-    //         message.error("Failed to fetch tutors.");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-    //
-    // useEffect(() => {
-    //     loadTutors();
-    // }, []);
-
-    const handleSearch = (value) => {
-        setSearchTerm(value);
-    };
-
-    const filteredData = data.filter(tutor =>
-        tutor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tutor.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tutor.phone.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const showDeleteConfirm = (key) => {
-        setSelectedTutorKey(key);
-        setIsModalVisible(true)
-    }
-
-    const handleAccept = (key) => {
-        setData(data.map(tutor =>
-            tutor.key === key ? {...tutor, status: "ACCEPTED"} : tutor
-        ));
-        message.success('Tutor request accepted successfully!');
-    };
-
-    const handleReject = (key) => {
-        setData(data.map(tutor =>
-            tutor.key === key ? {...tutor, status: "REJECTED"} : tutor
-        ));
-        message.success('Tutor request rejected successfully!');
-    };
-
-    const handleDelete = () => {
-        try {
-            // await deleteTutor(selectedTutorKey);
-            setData(data.filter(tutor => tutor.key !== selectedTutorKey));
-            message.success('Tutor request deleted successfully!');
-        } catch (err) {
-            message.error("Failed to delete tutors.");
-        } finally {
-            setIsModalVisible(false);
-            setSelectedTutorKey(null);
-        }
-    };
-
-    const handleCancel = () => {
-        setIsModalVisible(false);
-        setSelectedTutorKey(null);
-    }
-
-
     return (
         <div className="bg-white p-4 rounded-md flex-1 m-4">
             <div className="flex items-center justify-between">
@@ -279,9 +224,9 @@ const Tutors = () => {
                 </div>
             </div>
             <div className="mt-6">
-                {loading ? (
+                {isLoading ? (
                     <Spin style={{
-                        display:"flex",
+                        display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
                         height: "100vh",
@@ -290,7 +235,8 @@ const Tutors = () => {
                         top: 0,
                         left: 0,
                         backgroundColor: "transparent",
-                        zIndex: 9999}} size="large"/>
+                        zIndex: 9999
+                    }} size="large"/>
                 ) : (
                     <Table
                         columns={columns}
@@ -310,8 +256,18 @@ const Tutors = () => {
             >
                 <p>Are you sure you want to delete this tutor?</p>
             </Modal>
+            <Modal
+                title="Confirm Rejection"
+                open={isRejectModalVisible}
+                onOk={handleReject}
+                onCancel={handleRejectCancel}
+                okText="Yes, Reject"
+                cancelText="No, Cancel"
+            >
+                <p>Are you sure you want to reject this tutor?</p>
+            </Modal>
         </div>
     )
-}
+};
 
 export default Tutors;
