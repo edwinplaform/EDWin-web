@@ -13,6 +13,8 @@ import AvailabilitySection from "@/components/AvailabilitySection";
 import {useUser} from "@clerk/nextjs";
 import ProfilePicture from "@/components/ProfilePicture";
 import {role} from "@/util/Role";
+import {message} from "antd";
+import {useCreateUser, useUpgradeRole} from "@/hooks/useUsers";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
@@ -99,6 +101,9 @@ const OnBoarding = () => {
     const {user} = useUser();
     const userId = user?.id;
 
+    const createUserMutation = useCreateUser();
+    const upgradeRoleMutation = useUpgradeRole();
+
     const nextStep = async () => {
         let isValid = false;
         switch (step) {
@@ -139,8 +144,47 @@ const OnBoarding = () => {
                 role: role(user),
             };
 
-            console.log(submissionData);
-            setStep(5);
+            createUserMutation.mutate(submissionData, {
+                onSuccess: () => {
+                    console.log("User successfully created");
+
+                    upgradeRoleMutation.mutate(
+                        {userId: userId, role: role(user), isOnboarding: true},
+                        {
+                            onSuccess: () => {
+                                console.log("User role upgraded successfully!");
+                                setStep(5);
+                            },
+                            onError: (error) => {
+                                console.error("Error upgrading role:", error);
+                                message.error("Error upgrading role");
+                            }
+                        }
+                    );
+                },
+                onError: (error) => {
+                    console.error("Error creating user:", error);
+                    message.error("Error creating user");
+                }
+            });
+
+            // const response = await fetch(`${apiUrl}/users/`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(submissionData),
+            // });
+            //
+            // const result = await response.json();
+            // if (response.ok) {
+            //     console.log("user successfully created: ", result);
+            //     setStep(5);
+            // } else {
+            //     console.error("---------------error creating user: ", result.message);
+            //     message.error("Error creating user")
+            // }
+
         } catch (err) {
             console.log("------------submit err: ", err);
         }
@@ -173,7 +217,8 @@ const OnBoarding = () => {
                                 Step 1 of 4
                             </div>
                             <h1 className="text-lg font-bold my-2">Profile Details</h1>
-                            <p className="text-sm text-gray-500">Complete the registration form to create your profile on EDWin. Fields marked with * are required.</p>
+                            <p className="text-sm text-gray-500">Complete the registration form to create your profile
+                                on EDWin. Fields marked with * are required.</p>
                             <div className="flex flex-col md:flex-row justify-between mt-4 gap-4">
                                 <InputField
                                     label="First name*"
@@ -189,20 +234,20 @@ const OnBoarding = () => {
                                 />
                             </div>
                             <div className="my-4">
-                            <InputField
-                                label="Phone number*"
-                                name="phone"
-                                register={register}
-                                error={errors?.phone}
-                            />
+                                <InputField
+                                    label="Phone number*"
+                                    name="phone"
+                                    register={register}
+                                    error={errors?.phone}
+                                />
                             </div>
                             <div className="my-4">
-                            <InputField
-                                label="Address*"
-                                name="address"
-                                register={register}
-                                error={errors?.address}
-                            />
+                                <InputField
+                                    label="Address*"
+                                    name="address"
+                                    register={register}
+                                    error={errors?.address}
+                                />
                             </div>
                             <hr/>
                             <div className="flex flex-col md:flex-row mt-4 gap-3 items-center">

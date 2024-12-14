@@ -10,30 +10,25 @@ import {isOnboarding, role, saveUserData} from "@/util/Role";
 
 export default function Home() {
 
-    // const {user,isSignedIn} = useUser();
-    //
-    // const router = useRouter();
-    //
-    // useEffect(() => {
-    //     if (isSignedIn){
-    //         if (role(user) === "teacher" && !isOnboarding(user)){
-    //             redirect("/tutor/onboarding");
-    //         }
-    //
-    //         if (role(user) === "student" && !isOnboarding(user)){
-    //             redirect("/student/onboarding");
-    //         }
-    //
-    //         if (role(user) === "admin"){
-    //             redirect("/portal/tutors");
-    //         }
-    //
-    //         redirect("/portal/messages");
-    //     }
-    //
-    //     saveUserData(user).then(r => console.log("added to firestore!"));
-    //
-    // }, [user, router]);
+    const {user, isSignedIn} = useUser();
+
+    useEffect(() => {
+        if (isSignedIn) {
+            if (role(user) === "TUTOR" && !isOnboarding(user)) {
+                redirect("/tutor/onboarding");
+            } else if (role(user) === "STUDENT" && !isOnboarding(user)) {
+                redirect("/student/onboarding");
+            } else if (role(user) === "ADMIN") {
+                redirect("/portal/tutors");
+            } else {
+                redirect("/portal/tutors")
+            }
+            // redirect("");
+        }
+
+        saveUserData(user).then(r => console.log("added to firestore!"));
+
+    }, [isSignedIn, user]);
 
 
     return (

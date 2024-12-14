@@ -8,7 +8,7 @@ const SignUpPage = () => {
 
     return (
         <div>
-            <Signup href="/login" role="teacher"/>
+            <Signup href="/login" role="TUTOR"/>
         </div>
     );
 };

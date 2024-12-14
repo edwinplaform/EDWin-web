@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const TutorCard = ({profile}) => {
+
     return (
         <div className="bg-white rounded-3xl shadow-md m-4 w-72 hover:shadow-2xl transition-shadow">
             <Link href={`/tutors/${profile.id}`}>
