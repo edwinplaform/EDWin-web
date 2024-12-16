@@ -62,7 +62,14 @@ const Tutor = () => {
                                     className="font-bold"><b>{user.data.Tutor.currency} {user.data.Tutor.hourlyRate}</b></span> + GST</span>
                             </div>
                             <div className="justify-center md:justify-start">
-                                <BookForm/>
+                                <BookForm
+                                    tutorId={user.data.userId}
+                                    subjects={user.data.Tutor.subjects}
+                                    availableDays={user.data.Tutor.availability.days}
+                                    name={user.data.firstName}
+                                    availabilityStart={user.data.Tutor.availability.startTime}
+                                    availabilityEnd={user.data.Tutor.availability.endTime}
+                                />
                             </div>
                         </div>
                     </div>

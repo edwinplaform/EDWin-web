@@ -2,69 +2,45 @@
 import React, {useState} from "react";
 import {Button, DatePicker, Form, Input, message, Modal, Select, TimePicker} from "antd";
 import moment from "moment";
-import {DateInput} from "@nextui-org/react";
+import {useCreateAppointment} from "@/hooks/useAppointments";
+import {useUser} from "@clerk/nextjs";
 
 const {Option} = Select;
 
-const BookForm = () => {
+const BookForm = ({
+                      tutorId,
+                      subjects,
+                      availableDays,
+                      name,
+                      availabilityStart,
+                      availabilityEnd
+                  }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [booking, setBooking] = useState([]);
     const [form] = Form.useForm();
+    const createAppointmentMutation = useCreateAppointment();
 
-    const tutorAvailableDays = [1, 3, 5];
-    const tutorAvailableStart = moment("09:00", "HH:mm");
-    const tutorAvailableEnd = moment("17:00", "HH:mm");
+    const {user} = useUser();
+    const studentId = user.id;
+
 
     const disableDate = (current) => {
-        return current && !tutorAvailableDays.includes(current.day());
+        return current && !availableDays.includes(current.format('dddd').toLowerCase());
     };
 
-    // const disabledHours = () => {
-    //     const hours = Array.from({ length: 24 }, (_, i) => i);
-    //     return hours.filter(
-    //         (hour) => hour < tutorAvailableStart.hour() || hour >= tutorAvailableEnd.hour()
-    //     );
+    // const generateTimeSlots = (start,end) => {
+    //     const startTime = moment(start,"HH:mm");
+    //     const endTime = moment(end,"HH:mm");
+    //     const slots = [];
+    //
+    //     while (startTime.isBefore(endTime)){
+    //         slots.push(startTime.format("HH:mm"));
+    //         startTime.add(30,'minutes');
+    //     }
+    //
+    //     return slots;
     // };
     //
-    // const disabledMinutes = (selectedHour) => {
-    //     if (selectedHour === tutorAvailableStart.hour()) {
-    //         return Array.from({ length: 60 }, (_, i) => i).filter(
-    //             (minute) => minute < tutorAvailableStart.minute()
-    //         );
-    //     }
-    //     if (selectedHour === tutorAvailableEnd.hour() - 1) {
-    //         return Array.from({ length: 60 }, (_, i) => i).filter(
-    //             (minute) => minute >= tutorAvailableEnd.minute()
-    //         );
-    //     }
-    //     return [];
-    // };
-
-    // const disabledTime = (current) => {
-    //     const startHour = tutorAvailableStart.hour();
-    //     const endHour = tutorAvailableEnd.hour();
-    //
-    //     return {
-    //         disabledHours: () => {
-    //             const hours = Array.from({ length: 24 }, (_, i) => i);
-    //             return hours.filter((hour) => hour < startHour || hour >= endHour);
-    //         },
-    //         disabledMinutes: (selectedHour) => {
-    //             if (selectedHour === startHour) {
-    //                 return Array.from({ length: 60 }, (_, i) => i).filter(
-    //                     (minute) => minute < tutorAvailableStart.minute()
-    //                 );
-    //             }
-    //             if (selectedHour === endHour - 1) {
-    //                 return Array.from({ length: 60 }, (_, i) => i).filter(
-    //                     (minute) => minute >= tutorAvailableEnd.minute()
-    //                 );
-    //             }
-    //             return [];
-    //         },
-    //         disabledSeconds: () => Array.from({ length: 60 }, (_, i) => i), // Disable all seconds if needed
-    //     };
-    // };
+    // const availableTimeSlots = generateTimeSlots(availabilityStart,availabilityEnd);
 
 
     const handleCreateBook = () => {
@@ -101,21 +77,23 @@ const BookForm = () => {
 
         const newBooking = {
             ...values,
-            id: Date.now().toString(),
+            tutorId: tutorId,
+            studentId: studentId,
             date: date.format("YYYY-MM-DD"),
             startTime: startTime.format("HH:mm"),
             endTime: endTime.format("HH:mm"),
         };
 
-        setBooking((prev) => {
-            const updateBooking = [...prev,newBooking];
-            console.log("Booking: ", updateBooking);
-            return updateBooking;
+        createAppointmentMutation.mutate(newBooking, {
+            onSuccess: () => {
+                message.success("Lesson request sent successfully!");
+                setIsModalVisible(false);
+                form.resetFields();
+            },
+            onError: (error) => {
+                message.error(`Error creating appointment: ${error.message}`);
+            }
         });
-        // setBooking(newBooking);
-        setIsModalVisible(false);
-        form.resetFields();
-        message.success("Lesson request sent successfully!");
 
     };
 
@@ -128,7 +106,7 @@ const BookForm = () => {
                 Request Lesson
             </Button>
             <Modal
-                title="Request Lesson with Amal."
+                title={`Request Lesson with ${name}`}
                 open={isModalVisible}
                 onCancel={() => setIsModalVisible(false)}
                 footer={[
@@ -168,9 +146,9 @@ const BookForm = () => {
                         rules={[{required: true, message: "Please select a subject!"}]}
                     >
                         <Select placeholder="Choose a subject">
-                            <Option value="Maths">Maths</Option>
-                            <Option value="Physics">Physics</Option>
-                            <Option value="Chemistry">Chemistry</Option>
+                            {subjects.map((subject, index) => (
+                                <Option key={index} value={subject}>{subject}</Option>
+                            ))}
                         </Select>
                     </Form.Item>
                     <Form.Item
@@ -178,10 +156,6 @@ const BookForm = () => {
                         label="Grade"
                         rules={[{required: true, message: "Please enter your grade!"}]}
                     >
-                        {/*<Select placeholder="Select your grade">*/}
-                        {/*    <Option value="12">Grade 12</Option>*/}
-                        {/*    <Option value="13">Grade 13</Option>*/}
-                        {/*</Select>*/}
                         <Input placeholder="Enter your grade"/>
                     </Form.Item>
                     <Form.Item
@@ -190,46 +164,13 @@ const BookForm = () => {
                     >
                         <Input.TextArea placeholder="Type additional details here" rows={4}/>
                     </Form.Item>
-                    {/*<Form.Item*/}
-                    {/*    label="Desired date/time"*/}
-                    {/*>*/}
-                    {/*    <div className="flex gap-3 justify-between">*/}
-                    {/*        <Form.Item*/}
-                    {/*            name="date"*/}
-                    {/*            rules={[{required: true, message: "Please select a day!"}]}*/}
-                    {/*            noStyle*/}
-                    {/*        >*/}
-                    {/*            <Select placeholder="Choose Day" style={{flex: 1}}>*/}
-                    {/*                <Option value="monday">Monday</Option>*/}
-                    {/*                <Option value="tuesday">Tuesday</Option>*/}
-                    {/*                <Option value="wednesday">Wednesday</Option>*/}
-                    {/*                <Option value="thursday">Thursday</Option>*/}
-                    {/*                <Option value="friday">Friday</Option>*/}
-                    {/*            </Select>*/}
-                    {/*        </Form.Item>*/}
-                    {/*        <Form.Item*/}
-                    {/*            name="time"*/}
-                    {/*            rules={[{required: true, message: "Please select a time!"}]}*/}
-                    {/*            noStyle*/}
-                    {/*        >*/}
-                    {/*            <Select placeholder="Choose Time" style={{flex: 1}}>*/}
-                    {/*                <Option value="6.30">6:30AM</Option>*/}
-                    {/*                <Option value="7.30">7:30AM</Option>*/}
-                    {/*                <Option value="8.30">8:30AM</Option>*/}
-                    {/*                <Option value="9.30">9:30AM</Option>*/}
-                    {/*                <Option value="10.30">10:30AM</Option>*/}
-                    {/*                <Option value="11.30">11:30AM</Option>*/}
-                    {/*            </Select>*/}
-                    {/*        </Form.Item>*/}
-                    {/*    </div>*/}
-                    {/*</Form.Item>*/}
                     <Form.Item
                         name="date"
                         label="Desired date"
                         rules={[{required: true, message: "Please select a day!"}]}
                     >
                         <DatePicker disabledDate={disableDate}
-                                    style={{width:"100%"}}
+                                    style={{width: "100%"}}
                         />
                     </Form.Item>
                     <Form.Item
@@ -239,24 +180,28 @@ const BookForm = () => {
                         <div className="flex gap-3 justify-between">
                             <Form.Item
                                 name="startTime"
-                                rules={[{ required: true, message: "Please select a start time!" }]}
+                                rules={[{required: true, message: "Please select a start time!"}]}
                                 noStyle
                             >
                                 <TimePicker
                                     format="HH:mm"
                                     placeholder="Start Time"
-                                    style={{ flex: 1 }}
+                                    style={{flex: 1}}
+                                    // disableHours={() => availableTimeSlots.map(time => moment(time,"HH:mm").hour())}
+                                    // minuteStep={30}
                                 />
                             </Form.Item>
                             <Form.Item
                                 name="endTime"
-                                rules={[{ required: true, message: "Please select an end time!" }]}
+                                rules={[{required: true, message: "Please select an end time!"}]}
                                 noStyle
                             >
                                 <TimePicker
                                     format="HH:mm"
                                     placeholder="End Time"
-                                    style={{ flex: 1 }}
+                                    style={{flex: 1}}
+                                    // disableHours={() => availableTimeSlots.map(time => moment(time,"HH:mm").hour())}
+                                    // minuteStep={30}
                                 />
                             </Form.Item>
                         </div>
