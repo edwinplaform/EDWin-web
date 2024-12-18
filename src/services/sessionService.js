@@ -16,3 +16,8 @@ export const updateSessionStatus = async ({sessionId, status}) => {
     const response = await axiosInstance.patch(`/sessions/${sessionId}/status`, status);
     return response.data;
 }
+
+export const getPaidSessionsByStudentId = async (studentId) => {
+    const response = await axiosInstance.get(`/students/${studentId}/sessions/paid`);
+    return response.data;
+}

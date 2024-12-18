@@ -4,7 +4,7 @@ import {
     useQueryClient
 } from "@tanstack/react-query";
 import {
-    createSession,
+    createSession, getPaidSessionsByStudentId,
     getSessionsByTutorId,
     updateSession,
     updateSessionStatus
@@ -65,3 +65,11 @@ export const useSessionsByTutorId = (tutorId) => {
     });
 };
 
+export const usePaidSessionByStudentId = (studentId) => {
+    return useQuery({
+        queryKey: ["sessions", studentId],
+        queryFn: () => getPaidSessionsByStudentId(studentId),
+        enabled: !!studentId,
+        ...defaultQueryOptions,
+    });
+};
