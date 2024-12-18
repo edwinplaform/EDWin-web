@@ -6,7 +6,7 @@ import {
 import {
     createInvoice,
     updateInvoicePayment,
-    getStudentInvoice,
+    getStudentInvoice, getStudentPayments,
 } from "@/services/invoiceService";
 
 const defaultQueryOptions = {
@@ -31,6 +31,15 @@ export const useStudentInvoices = (studentId) => {
     });
 };
 
+export const useStudentPayments = (tutorId) => {
+    return useQuery({
+        queryKey: ["invoices", tutorId],
+        queryFn: () => getStudentPayments(tutorId),
+        enabled: !!tutorId,
+        ...defaultQueryOptions,
+    });
+};
+
 export const useCreateInvoice = () => {
     const queryClient = useQueryClient();
     return useMutation(createInvoice, {
@@ -40,7 +49,14 @@ export const useCreateInvoice = () => {
 
 export const useUpdateInvoicePayment = () => {
     const queryClient = useQueryClient();
-    return useMutation(updateInvoicePayment, {
-        onSuccess: () => queryClient.invalidateQueries("invoices"),
+    return useMutation({
+        mutationFn: updateInvoicePayment,
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(["invoices"]);
+            console.log(`Invoice ${variables.id} payment receipt updated successfully!`);
+        },
+        onError: (error) => {
+            console.error(`Error updating invoice receipt: ${error.response?.data?.message || error.message}`);
+        },
     });
 };
