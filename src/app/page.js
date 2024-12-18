@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image";
 import Banner from "@/components/Banner";
 import Link from "next/link";
 import {useAuth, useUser} from "@clerk/nextjs";

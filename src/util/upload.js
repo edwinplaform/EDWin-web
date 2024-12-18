@@ -17,10 +17,6 @@ export const uploadFile = async (file, type) => {
 
     console.log("Upload successful, file path:", data.path);
 
-    // const {publicURL, error: urlError} = supabase.storage
-    //     .from('edwin')
-    //     .getPublicUrl(data.path);
-
     const {data: urlData,error: urlError} = supabase.storage
         .from('edwin')
         .getPublicUrl(filePath);
