@@ -3,5 +3,5 @@ export const NAV_LINKS = [
     { href: '/tutors', key: 'find_tutors', label: 'Find Tutors' },
     { href: '/courses', key: 'courses', label: 'Courses' },
     { href: '/become-tutor', key: 'become_tutor', label: 'Become a Tutor' },
-    { href: '/', key: 'contact_us', label: 'Contact Us' },
+    { href: '/contact-us', key: 'contact_us', label: 'Contact Us' },
 ];
