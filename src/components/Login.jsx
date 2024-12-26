@@ -30,14 +30,18 @@ const Login = ({href}) => {
                     </div>
                     <Clerk.Field name="identifier" className="flex flex-col gap-2">
                         <Clerk.Label className="text-sm font-medium">Email</Clerk.Label>
-                        <Clerk.Input className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400" required
-                                     type="email"/>
+                        <Clerk.Input
+                            className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+                            required
+                            type="email"/>
                         <Clerk.FieldError className="block text-sm text-red-400"/>
                     </Clerk.Field>
                     <Clerk.Field name="password" className="flex flex-col gap-2">
                         <Clerk.Label className="text-sm font-medium">Password</Clerk.Label>
-                        <Clerk.Input className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400" required
-                                     type="password"/>
+                        <Clerk.Input
+                            className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+                            required
+                            type="password"/>
                         <Clerk.FieldError className="block text-sm text-red-400"/>
                     </Clerk.Field>
                     <SignIn.Action submit className="w-full bg-black text-white my-1 rounded-md text-sm p-[10px]">Sign

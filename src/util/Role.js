@@ -1,12 +1,21 @@
 // import {auth, currentUser} from "@clerk/nextjs/server";
-import {doc, setDoc, getDoc} from "firebase/firestore";
+import {doc, getDoc, setDoc} from "firebase/firestore";
 import {db} from "../../firebase";
+import {user} from "@nextui-org/react";
+// import {auth} from "@clerk/nextjs/server";
 
 // export const CurrentRole = () => {
-//     const {sessionClaims} = auth();
+//     const {sessionClaims} = auth;
 //
 //     return sessionClaims.public_metadata?.role;
 // };
+export const role = (user) => {
+    return user?.publicMetadata.role;
+}
+
+export const isOnboarding = (user) => {
+    return user?.publicMetadata.isOnboarding;
+}
 
 
 export const saveUserData = async (user) => {

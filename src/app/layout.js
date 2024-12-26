@@ -1,7 +1,5 @@
 import {Inter, Poppins} from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import {ClerkProvider} from "@clerk/nextjs";
 import Layout from "@/components/Layout";
 
@@ -14,7 +12,6 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
 
   return (
       <ClerkProvider>
