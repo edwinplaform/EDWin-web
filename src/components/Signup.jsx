@@ -33,11 +33,8 @@ const Signup = ({ href, role }) => {
           className="w-1/3 space-y-6 rounded-2xl bg-white px-4 py-10 shadow-md ring-1 ring-black/5 sm:px-8"
         >
           <header className=" flex justify-between">
-          <h1 className="mt-2 text-4xl text-gray-700 font-bold">
-              Sign Up
-            </h1>
+            <h1 className="mt-2 text-4xl text-gray-700 font-bold">Sign Up</h1>
             <h1 className="mt-2 font-bold text-lg">EDWin</h1>
-            
           </header>
           <Clerk.GlobalError className="block text-sm text-red-400" />
 
