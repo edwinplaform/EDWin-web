@@ -28,6 +28,7 @@ module.exports = {
         cusYellowLight:"#FEFCE8",
       },
     },
+
   },
   plugins: [],
 };
