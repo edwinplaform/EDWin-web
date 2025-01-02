@@ -36,7 +36,7 @@ const CourseCard = ({id,name,title,grade,price,image}) => {
 
             </Link>
         </div>
-);
+    );
 };
 
 export default CourseCard;
