@@ -1,39 +1,34 @@
-"use client"
+'use client';
 
+import {useUser} from '@clerk/nextjs';
 import Sidebar from "@/components/chat/Sidebar";
-import Chat from "@/components/chat/Chat";
-import {useUser} from "@clerk/nextjs";
-// import {currentUser} from "@clerk/nextjs/server";
-import { doc,setDoc } from "firebase/firestore"
-import {db} from "../../../../firebase";
-import {useEffect} from "react";
+import ChatWindow from "@/components/chat/ChatWindow";
+import {useState} from 'react';
 
-const MessagesPage = () => {
-
-    // const saveUserData = async () => {
-    //     const user = currentUser();
-    //     if (user) {
-    //         await setDoc(doc(db,'users',(await user).id), {
-    //             id: (await user).id,
-    //             username: (await user).firstName + " " + (await user).lastName,
-    //             email : (await user).emailAddresses,
-    //         });
-    //     }
-    // };
-
+const ChatPage = () => {
     const {user} = useUser();
-    useEffect(() => {
-        console.log(user);
-    }, []);
+    const [selectedChat, setSelectedChat] = useState(null);
 
-    return(
-        <div className="h-screen flex items-center justify-center">
-            <div className="flex w-5/6 h-5/6 rounded-lg shadow-lg overflow-hidden">
-                <Sidebar/>
-                <Chat/>
+    if (!user) return null;
+
+    return (
+        <div className="h-screen bg-gray-50">
+            <div className="container mx-auto h-full px-6 py-6">
+                <div className="flex h-[90vh] overflow-hidden rounded-lg shadow-lg">
+                    <Sidebar
+                        userId={user.id}
+                        onSelectChat={setSelectedChat}
+                        selectedChat={selectedChat}
+                    />
+                    <ChatWindow
+                        userId={user.id}
+                        chatId={selectedChat}
+                        userName={user.firstName || ''}
+                    />
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default MessagesPage;
+export default ChatPage;
