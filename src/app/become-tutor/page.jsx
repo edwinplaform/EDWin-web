@@ -16,7 +16,7 @@ export const features = [
       "Decide when and how many hours you want to teach. No minimum time commitment or fixed schedule. Be your own boss!",
   },
   {
-    image: "/Money.png",
+    image: "/Money2.png",
     title: "Earn for every lesson",
     description:
       "Choose your hourly rate and change it anytime. Earn while you are studying.",
@@ -27,6 +27,7 @@ export const features = [
     description:
       "EDWin encourages tutors to improve new skill sets through continuous learning.",
   },
+  
 ];
 
 export const questions = [
