@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 
 export const features = [
   {
+    
     image: "/WorkFromHome.png",
     title: "Tutor anytime, anywhere",
     description:
