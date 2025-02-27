@@ -39,7 +39,7 @@ function ContactUs() {
             className="flex items-start py-4 w-full"
             initial={{ opacity: 0, x: -275 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             transition={{ duration: 0.75, delay: 0.25 }}
           >
             <FaLocationDot className="text-blue-800 bg-blue-200 rounded-full p-2 w-10 h-10" />
@@ -55,7 +55,7 @@ function ContactUs() {
             className="flex items-start py-4 w-full"
             initial={{ opacity: 0, x: -275 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             transition={{ duration: 0.75, delay: 0.25 }}
           >
             <IoCallSharp className="text-blue-800 bg-blue-200 rounded-full p-2 w-10 h-10" />
@@ -69,7 +69,7 @@ function ContactUs() {
             className="flex items-start py-4 w-full"
             initial={{ opacity: 0, x: -275 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             transition={{ duration: 0.75, delay: 0.25 }}
           >
             <MdEmail className="text-blue-800 bg-blue-200 rounded-full p-2 w-10 h-10" />
@@ -85,7 +85,7 @@ function ContactUs() {
           className="w-full sm:w-1/2 flex justify-center items-center px-3 sm:mr-56"
           initial={{ opacity: 0, x: 275 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.75, delay: 0.25 }}
         >
           {/* <div className="w-full"><iframe width="100%" height="600" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Keenagahena,Dalkada,%20Bombuwala,%20Kalutara%20South,%20Sri%20Lanka+(EDWin)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"><a href="https://www.gps.ie/">gps tracker sport</a></iframe></div> */}
@@ -102,7 +102,7 @@ function ContactUs() {
           className="flex items-center justify-center"
           initial={{ opacity: 0, y: 72 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.25 }}
         >
           <MdEmail className="w-12 h-12 p-2 text-blue-900" />
@@ -114,17 +114,17 @@ function ContactUs() {
           className="text-md px-2 sm:p-1 mt-10"
           initial={{ opacity: 0, y: 70 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.3 }}
         >
           If you have any questions or need help, please fill out the form
           below. We do our best to respond within 1 business day.
         </motion.p>
-        ;
+
         <motion.div
           initial={{ opacity: 0, y: 75 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.25 }}
           className="flex flex-col items-center w-full sm:w-1/2 bg-white border border-blue-800 rounded-lg p-6 md:p-10 mx-4"
         >
@@ -165,7 +165,7 @@ function ContactUs() {
         <motion.div
           initial={{ opacity: 0, y: 75 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.25 }}
           className="flex items-center justify-center"
         >
@@ -179,7 +179,7 @@ function ContactUs() {
           className="sm:w-1/2 w-full rounded-xl p-5 sm:p-10"
           initial={{ opacity: 0, y: 75 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.25 }}
         >
           <iframe
