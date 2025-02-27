@@ -105,21 +105,21 @@ const Settings = () => {
 
             <div className="grid grid-cols-1 divide-y divide-neutral-300 border border-neutral-200 mt-8 w-full rounded-lg shadow-sm">
               <div
-                className="text-sm p-3 hover:font-medium hover:bg-blue-100 transition-all cursor-pointer"
+                className="text-sm p-3 hover:font-medium hover:bg-gray-100 transition-all cursor-pointer"
                 aria-label="Account"
                 onClick={() => setView("account")}
               >
                 Account
               </div>
               <div
-                className="text-sm p-3 hover:font-medium hover:bg-blue-100 transition-all cursor-pointer"
+                className="text-sm p-3 hover:font-medium hover:bg-gray-100 transition-all cursor-pointer"
                 aria-label="Password"
                 onClick={() => setView("password")}
               >
                 Password
               </div>
               <div
-                className="text-sm p-3 hover:font-medium hover:bg-blue-100 transition-all cursor-pointer"
+                className="text-sm p-3 hover:font-medium hover:bg-gray-100 transition-all cursor-pointer"
                 aria-label="Billing"
                 onClick={() => setView("billing")}
               >
@@ -228,7 +228,7 @@ const Settings = () => {
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
                     <div
-                      className=" cursor-pointer text-gray-600 p-3"
+                      className=" cursor-pointer text-gray-600 px-3"
                       onClick={() => setVisible(!visible)}
                     >
                       {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
@@ -250,7 +250,7 @@ const Settings = () => {
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
                     <div
-                      className="cursor-pointer text-gray-600 p-3"
+                      className="cursor-pointer text-gray-600 px-3"
                       onClick={() => setVisible(!visible)}
                     >
                       {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
@@ -272,7 +272,7 @@ const Settings = () => {
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
                     <div
-                      className="cursor-pointer text-gray-600 p-3"
+                      className="cursor-pointer text-gray-600 px-3"
                       onClick={() => setVisible(!visible)}
                     >
                       {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
@@ -289,6 +289,7 @@ const Settings = () => {
                   </button>
                   <button
                     type="button"
+
                     onClick={() => setView("account")}
                     className="w-52 my-1 rounded-md text-sm p-[10px] rounded-lg hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out border-2 border-black"
                   >

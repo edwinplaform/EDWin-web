@@ -98,7 +98,7 @@ const BecomeTutor = () => {
             className="lg:w-1/2 p-6 sm:mr-20 flex justify-center lg:justify-end"
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             transition={{ duration: 0.75, delay: 0.25 }}
           >
             <img
@@ -114,7 +114,7 @@ const BecomeTutor = () => {
             className="text-2xl text-center font-semibold text-indigo-900 mt-10"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
             Enjoy a world of perks while tutoring
@@ -126,7 +126,7 @@ const BecomeTutor = () => {
                 className="w-full sm:w-1/3 lg:w-1/3"
                 initial={{ opacity: 0, y: 75 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.75, delay: 0.25 }}
               >
                 <div className="flex">
@@ -150,7 +150,7 @@ const BecomeTutor = () => {
             className="text-2xl text-center font-semibold text-indigo-900"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
             Frequently Asked Questions
@@ -158,7 +158,7 @@ const BecomeTutor = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.25 }}
             className="flex flex-col items-center mt-5 lg:mt-10 p-5 space-y-4 lg:space-y-6"
           >
