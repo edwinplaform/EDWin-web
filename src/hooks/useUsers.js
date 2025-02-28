@@ -10,6 +10,7 @@ import {
     updateTutorStatus,
     filterUsers,
 } from "@/services/userService";
+import {updateSession} from "@/services/sessionService";
 
 const defaultQueryOptions = {
     staleTime: 5 * 60 * 1000,
@@ -49,13 +50,14 @@ export const useCreateUser = () => {
 
 export const useUpdateUser = () => {
     const queryClient = useQueryClient();
-    return useMutation(({userId, data}) => updateUser(userId, data), {
-        onSuccess: (data, {userId}) => {
+    return useMutation({
+        mutationFn: updateUser,
+        onSuccess: (data, variables) => {
             queryClient.invalidateQueries(['users']);
-            queryClient.invalidateQueries(['user', userId]);
+            console.log(`User ${variables.id} updated successfully!`);
         },
         onError: (error, variables) => {
-            console.error('Error updating user:', error, variables);
+            console.error(`Error updating user: ${error.response?.data?.message || error.message}`);
         },
     });
 };
