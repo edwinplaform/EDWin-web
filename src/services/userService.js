@@ -3,11 +3,14 @@ import axiosInstance from "@/util/axiosInstance";
 
 export const upgradeRole = (data) => axiosInstance.post('/users/upgradeRole', data);
 
-export const createUser = (userData) => axiosInstance.post('/users/', userData);
+export const createUser = (userId, userData) => axiosInstance.post(`/users/${userId}`, userData);
 
 export const getUserById = (userId) => axiosInstance.get(`/users/${userId}`);
 
-export const updateUser = (userId, data) => axiosInstance.put(`/users/${userId}`, data);
+export const updateUser = async ({userId, userData}) => {
+    const response = await axiosInstance.patch(`/users/${userId}`, userData);
+    return response.data;
+}
 
 export const deleteUser = (userId) => axiosInstance.delete(`/users/${userId}`);
 
