@@ -3,7 +3,9 @@ import React, {useState} from "react";
 import {Button, DatePicker, Form, Input, message, Modal, Select, TimePicker} from "antd";
 import moment from "moment";
 import {useCreateAppointment} from "@/hooks/useAppointments";
-import {useUser} from "@clerk/nextjs";
+import {useCurrentUser} from "@/util/auth";
+import {useRouter} from "next/navigation";
+// import {useUser} from "@clerk/nextjs";
 
 const {Option} = Select;
 
@@ -19,8 +21,12 @@ const BookForm = ({
     const [form] = Form.useForm();
     const createAppointmentMutation = useCreateAppointment();
 
-    const {user} = useUser();
-    const studentId = user.id;
+    // const {user} = useUser();
+    const user = useCurrentUser();
+    const studentId = user?.id;
+    console.log("student Id: ", studentId);
+
+    const router = useRouter();
 
 
     const disableDate = (current) => {
@@ -44,6 +50,10 @@ const BookForm = ({
 
 
     const handleCreateBook = () => {
+        if (!user) {
+            router.push("/login");
+            return;
+        }
         setIsModalVisible(true);
     };
 
