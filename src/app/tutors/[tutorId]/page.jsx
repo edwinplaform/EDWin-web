@@ -3,22 +3,22 @@
 import Image from "next/image";
 import BookForm from "@/components/BookForm";
 import Reviews from "@/components/Reviews";
-import Nav from "@/components/Nav";
-import {useUser} from "@clerk/nextjs";
 import {useUserById} from "@/hooks/useUsers";
 import {useParams} from "next/navigation";
+import {Spin} from "antd";
+import React from "react";
 
 const Tutor = () => {
-    const {isSignedIn} = useUser();
     const {tutorId} = useParams();
-
 
     const {data: user, isLoading, error} = useUserById(tutorId);
 
     console.log("---row data: ", user);
 
     if (!tutorId || isLoading) {
-        return <div>Loading...</div>;
+        return <div className="flex justify-center items-center py-12">
+            <Spin size="large"/>
+        </div>;
     }
 
     if (error) {
@@ -36,12 +36,14 @@ const Tutor = () => {
 
     return (
         <>
-            {isSignedIn && <Nav/>}
             <div className="bg-bgColorWhite">
                 <div className="max-w-4xl mx-auto  p-4">
                     <div className="bg-white rounded-xl p-6 flex flex-col md:flex-row items-center mt-6">
-                        <Image src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg" alt=""
-                               width={200} height={200} className="rounded-md h-32 w-32 md:w-64 md:h-64"/>
+                        <div className="relative rounded-md h-32 w-32 md:w-64 md:h-64">
+                            <Image
+                                src={user.data.profilePhotoUrl || "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg"}
+                                alt="tutor profile photo" fill objectFit="cover" />
+                        </div>
                         <div className="md:ml-6 mt-4 md:mt-0 text-center md:text-left">
                             <div className="flex gap-10">
                                 <div
@@ -88,9 +90,9 @@ const Tutor = () => {
                         <div className="bg-white rounded-xl shadow-sm p-6 mt-4">
                             <p className="text-gray-700 mb-3 font-semibold text-sm">I currently offer tutoring for :</p>
                             <div className="flex flex-wrap gap-2 opacity-80 mb-2">
-                                {user.data.Tutor.subjects.map((subject,index) => (
+                                {user.data.Tutor.subjects.map((subject, index) => (
                                     <span key={index}
-                                        className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold text-sm">{subject}</span>
+                                          className="bg-red-100 text-red-600 px-4 py-2 rounded-full font-semibold text-sm">{subject}</span>
                                 ))}
                             </div>
                         </div>
