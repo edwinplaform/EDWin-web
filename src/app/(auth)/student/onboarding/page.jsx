@@ -5,13 +5,13 @@ import InputField from "@/components/InputField";
 import React, {useState} from "react";
 import {useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useUser} from "@clerk/nextjs";
 import {z} from "zod";
 import Image from "next/image";
 import Link from "next/link";
-import {role} from "@/util/Role";
 import {message} from "antd";
-import {useCreateUser, useUpgradeRole} from "@/hooks/useUsers";
+import {useCreateUser, useUpdateUser, useUpgradeRole} from "@/hooks/useUsers";
+import {useChatUserSetup} from "@/hooks/useChatUserSetup";
+import {useCurrentUser} from "@/util/auth";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
@@ -22,6 +22,10 @@ const schema = z.object({
 });
 
 const StudentOnboarding = () => {
+    const user = useCurrentUser();
+    const userId = user?.id;
+    console.log("------------id: ", userId);
+
     const {
         register,
         control,
@@ -49,11 +53,10 @@ const StudentOnboarding = () => {
         name: "subjects"
     });
 
-    const {user} = useUser();
-    const userId = user?.id;
-
-    const createUserMutation = useCreateUser();
-    const upgradeRoleMutation = useUpgradeRole();
+    // const createUserMutation = useCreateUser();
+    const updateUserMutation = useUpdateUser();
+    // const upgradeRoleMutation = useUpgradeRole();
+    const {setupChatUser, isCreatingChatUser, chatUserError} = useChatUserSetup();
 
     const nextStep = async () => {
         let isValid = false;
@@ -77,54 +80,34 @@ const StudentOnboarding = () => {
 
     const onSubmit = async (data) => {
         try {
+            const chatUserSuccess = await setupChatUser(userId, {
+                ...data,
+                imageUrl: user?.imageUrl
+            });
+
+            if (!chatUserSuccess) {
+                message.error("Failed to set up chat profile");
+                return;
+            }
+
             const submissionData = {
                 ...formData,
                 ...data,
                 createdAt: new Date(),
-                userId: userId,
-                role: role(user)
+                role:"STUDENT",
+                isOnboarding: true
             };
 
-            createUserMutation.mutate(submissionData, {
+            await updateUserMutation.mutateAsync({userId, userData: submissionData}, {
                 onSuccess: () => {
                     console.log("user successfully created");
-
-                    upgradeRoleMutation.mutate(
-                        {userId: userId, role: role(user), isOnboarding: true},
-                        {
-                            onSuccess: () => {
-                                console.log("User role upgraded successfully!");
-                                setStep(2);
-                            },
-                            onError: (error) => {
-                                console.error("Error upgrading role:", error);
-                                message.error("Error upgrading role");
-                            }
-                        }
-                    );
+                    setStep(2);
                 },
                 onError: (error) => {
                     console.error("Error creating user:", error);
                     message.error("Error creating user");
                 }
             });
-
-            // const response = await fetch(`${apiUrl}/users/`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify(submissionData),
-            // });
-            //
-            // const result = await response.json();
-            // if (response.ok) {
-            //     console.log("user successfully created: ", result);
-            //     setStep(2);
-            // } else {
-            //     console.error("---------------error creating user: ", result.message);
-            //     message.error("Error creating user")
-            // }
         } catch (err) {
             console.log("------------submit err: ", err);
         }

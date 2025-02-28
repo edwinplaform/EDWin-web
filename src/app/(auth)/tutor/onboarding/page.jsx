@@ -10,11 +10,11 @@ import Image from "next/image";
 import Link from "next/link";
 import Upload from "@/components/Upload";
 import AvailabilitySection from "@/components/AvailabilitySection";
-import {useUser} from "@clerk/nextjs";
 import ProfilePicture from "@/components/ProfilePicture";
-import {role} from "@/util/Role";
 import {message} from "antd";
-import {useCreateUser, useUpgradeRole} from "@/hooks/useUsers";
+import {useCreateUser, useUpdateUser, useUpgradeRole} from "@/hooks/useUsers";
+import {useChatUserSetup} from "@/hooks/useChatUserSetup";
+import {useCurrentUser} from "@/util/auth";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
@@ -52,6 +52,11 @@ const schema = z.object({
 
 
 const OnBoarding = () => {
+
+    const user = useCurrentUser();
+    const userId = user?.id;
+    console.log("--------userId: ",userId);
+
     const {
         register,
         control,
@@ -98,11 +103,8 @@ const OnBoarding = () => {
         name: "qualifications"
     });
 
-    const {user} = useUser();
-    const userId = user?.id;
-
-    const createUserMutation = useCreateUser();
-    const upgradeRoleMutation = useUpgradeRole();
+    const updateUserMutation = useUpdateUser();
+    const {setupChatUser,isCreatingChatUser,chatUserError} = useChatUserSetup();
 
     const nextStep = async () => {
         let isValid = false;
@@ -135,56 +137,48 @@ const OnBoarding = () => {
 
     const onSubmit = async (data) => {
         try {
+            console.log(data);
+            const chatUserSuccess = await setupChatUser(userId,{
+                ...data,
+            });
+
+            if (!chatUserSuccess){
+                message.error("Failed to set up chat profile");
+                return;
+            }
+
             const submissionData = {
                 ...formData,
                 ...data,
                 createdAt: new Date(),
                 status: 'pending',
-                userId: userId,
-                role: role(user),
+                isOnboarding: true,
+                role: "TUTOR"
             };
 
-            createUserMutation.mutate(submissionData, {
+            await updateUserMutation.mutateAsync({userId, userData: submissionData}, {
                 onSuccess: () => {
                     console.log("User successfully created");
-
-                    upgradeRoleMutation.mutate(
-                        {userId: userId, role: role(user), isOnboarding: true},
-                        {
-                            onSuccess: () => {
-                                console.log("User role upgraded successfully!");
-                                setStep(5);
-                            },
-                            onError: (error) => {
-                                console.error("Error upgrading role:", error);
-                                message.error("Error upgrading role");
-                            }
-                        }
-                    );
+                    setStep(5);
+                    // upgradeRoleMutation.mutate(
+                    //     {userId: userId, role: role(user), isOnboarding: true},
+                    //     {
+                    //         onSuccess: () => {
+                    //             console.log("User role upgraded successfully!");
+                    //
+                    //         },
+                    //         onError: (error) => {
+                    //             console.error("Error upgrading role:", error);
+                    //             message.error("Error upgrading role");
+                    //         }
+                    //     }
+                    // );
                 },
                 onError: (error) => {
                     console.error("Error creating user:", error);
                     message.error("Error creating user");
                 }
             });
-
-            // const response = await fetch(`${apiUrl}/users/`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify(submissionData),
-            // });
-            //
-            // const result = await response.json();
-            // if (response.ok) {
-            //     console.log("user successfully created: ", result);
-            //     setStep(5);
-            // } else {
-            //     console.error("---------------error creating user: ", result.message);
-            //     message.error("Error creating user")
-            // }
-
         } catch (err) {
             console.log("------------submit err: ", err);
         }
@@ -423,10 +417,10 @@ const OnBoarding = () => {
                                 prospective students on EDWin.</p>
                             <div className="my-6 mb-5">
                                 <h1 className="text-xs text-gray-500">Add display picture*</h1>
-                                <ProfilePicture/>
+                                <ProfilePicture setValue={setValue}/>
                                 <div className="flex flex-col gap-2 w-full">
                                     <label htmlFor="description" className="text-xs text-gray-500">Tell the world
-                                        about*</label>
+                                        about you*</label>
                                     <textarea id="description" rows={5} {...register("description")}
                                               className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"/>
                                     {errors?.description && (
