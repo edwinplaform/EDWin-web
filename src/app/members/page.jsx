@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const AdminDashboard = () => {
+const Members = () => {
   const [userType, setUserType] = useState('student'); 
   const [firstNameFilter, setFirstNameFilter] = useState('');
   const [lastNameFilter, setLastNameFilter] = useState('');
@@ -43,7 +43,8 @@ const AdminDashboard = () => {
             value={userType}
             onChange={(e) => setUserType(e.target.value)}
           >
-            <option value="student">Students</option>
+            <option value="student">Students</option>| userId | firstName | lastName | phone     | email            | address                   | role    | createdAt |
+
             <option value="tutor">Tutors</option>
           </select>
         </div>
@@ -117,4 +118,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default Members;
