@@ -2,36 +2,31 @@
 
 import Banner from "@/components/Banner";
 import Link from "next/link";
-import {useAuth, useUser} from "@clerk/nextjs";
 import {redirect, useRouter} from "next/navigation";
 import {useEffect} from "react";
-import {isOnboarding, role, saveUserData} from "@/util/Role";
 import Stats from "@/components/Stats";
 import WhyEDWin from "@/components/WhyEdwin";
-import UserReviews from "@/components/UserReviews";
-import ReviewSlider from "@/components/ReviewSlider";
+import {getCurrentUser} from "@/util/auth";
 
 export default function Home() {
 
-    const {user, isSignedIn} = useUser();
+    const router = useRouter();
 
     useEffect(() => {
-        if (isSignedIn) {
-            if (role(user) === "TUTOR" && !isOnboarding(user)) {
-                redirect("/tutor/onboarding");
-            } else if (role(user) === "STUDENT" && !isOnboarding(user)) {
-                redirect("/student/onboarding");
-            } else if (role(user) === "ADMIN") {
-                redirect("/portal/tutors");
-            } else {
-                redirect("/portal/tutors")
+        const checkUser = async () => {
+            const user = await getCurrentUser();
+            if (user){
+                if (user.role === "TUTOR" && !user.isOnboarding){
+                    router.push("/tutor/onboarding");
+                } else if (user.role === "STUDENT" && !user.isOnboarding){
+                    router.push("/student/onboarding");
+                } else if (user.role === "ADMIN"){
+                    router.push("/portal/tutors");
+                }
             }
-            // redirect("");
-        }
-
-        saveUserData(user).then(r => console.log("added to firestore!"));
-
-    }, [isSignedIn, user]);
+        };
+        checkUser();
+    },[]);
 
 
     return (
@@ -44,8 +39,6 @@ export default function Home() {
             </div>
             <Stats/>
             <WhyEDWin/>
-            <ReviewSlider/>
-
             <div className="p-14 my-6 items-center justify-center flex">
                 <h2 className="relative text-3xl sm:text-7xl text-black font-semibold">Lessons {"you'll"} love.
                     Guaranteed.</h2>
