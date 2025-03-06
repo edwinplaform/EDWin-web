@@ -1,17 +1,14 @@
 import {Button, message, Upload} from 'antd';
 import {useState} from "react";
 import {supabase} from "../../supabase";
-import {useUser} from "@clerk/nextjs";
+import {useCurrentUser} from "@/util/auth";
 
 const UploadButton = ({setValue}) => {
-
     const [fileList, setFileList] = useState([]);
     const [uploading, setUploading] = useState(false);
-    const {user} = useUser();
+    const user = useCurrentUser();
 
-    const handleFileUpload = async (options) => {
-        const {file} = options;
-
+    const handleFileUpload = async ({file, onSuccess, onError}) => {
         const isValidType = ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type);
         const isValidSize = file.size <= 5 * 1024 * 1024;
 
@@ -43,6 +40,7 @@ const UploadButton = ({setValue}) => {
             if (error) {
                 console.error("----------supabase uploading err: ", error);
                 message.error("Failed to upload certificate");
+                onError(error);
                 return false;
             }
 
@@ -57,30 +55,27 @@ const UploadButton = ({setValue}) => {
                 return false;
             }
 
-            const newFileList = [{
+            setFileList([{
                 name: file.name,
                 status: 'done',
                 url: publicURL,
-            }];
-
-            setFileList(newFileList);
+            }]);
 
             setValue('certificateUrl', publicURL);
 
             message.success("Certificate uploaded successfully.");
+            onSuccess(publicURL);
             return true;
 
         } catch (err) {
-
-            const newFileList = [{
+            setFileList([{
                 name: file.name,
                 status: 'error',
-            }];
-
-            setFileList(newFileList);
+            }]);
 
             console.log("-----------------err for upload: ", err);
             message.error("Failed to upload certificate");
+            onError(err);
             return false;
 
         } finally {
