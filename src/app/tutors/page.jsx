@@ -1,14 +1,11 @@
 "use client"
 import TutorCard from "@/components/TutorCard";
 import Filter from "@/components/Filter";
-import Nav from "@/components/Nav";
-import {useState} from "react";
-import {useUser} from "@clerk/nextjs";
+import React, {useState} from "react";
 import {useTutorsByStatus, useUsers} from "@/hooks/useUsers";
+import {Spin} from "antd";
 
 const TutorPage = () => {
-
-    const {isSignedIn} = useUser();
 
     const [filteredProfiles, setFilteredProfiles] = useState([]);
 
@@ -16,7 +13,9 @@ const TutorPage = () => {
     const tutors = response?.data || [];
 
     if (isLoading) {
-        return <div>Loading Tutors...</div>
+        return <div className="flex justify-center items-center py-12">
+            <Spin size="large"/>
+        </div>
     }
 
     if (error) {
@@ -40,7 +39,6 @@ const TutorPage = () => {
 
     return (
         <div className="bg-bgColorWhite">
-            {isSignedIn ? <Nav/> : " "}
             <div className="justify-center items-center p-6">
                 <Filter onFilterChange={handleFilterChange}/>
             </div>
@@ -55,7 +53,7 @@ const TutorPage = () => {
                             profile={{
                                 id: tutor.userId,
                                 name: `${tutor.User.firstName} ${tutor.User.lastName}`,
-                                image: "https://images.pexels.com/photos/4116672/pexels-photo-4116672.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", // Replace with a default image URL if necessary
+                                image: tutor.User.profilePhotoUrl || "https://images.pexels.com/photos/4116672/pexels-photo-4116672.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", // Replace with a default image URL if necessary
                                 rate: `${tutor.currency} ${tutor.hourlyRate}/hr`,
                                 description: `${tutor.description.substring(0, 50)}...`,
                                 subjects: tutor.subjects,
