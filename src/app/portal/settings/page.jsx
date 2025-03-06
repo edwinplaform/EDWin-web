@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { UserButton, UserProfile } from "@clerk/nextjs";
+// import { UserButton, UserProfile } from "@clerk/nextjs";
 import { useState } from "react";
 import { Button, Select } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
@@ -98,9 +98,7 @@ const Settings = () => {
                 className="hidden"
                 onChange={handleImageChange}
               />
-              <p className="mt-4 font-semibold text-base">
-                Rachel Daves
-              </p>
+              <p className="mt-4 font-semibold text-base">Rachel Daves</p>
             </div>
 
             <div className="grid grid-cols-1 divide-y divide-neutral-300 border border-neutral-200 mt-8 w-full rounded-lg shadow-sm">
@@ -289,7 +287,6 @@ const Settings = () => {
                   </button>
                   <button
                     type="button"
-
                     onClick={() => setView("account")}
                     className="w-52 my-1 rounded-md text-sm p-[10px] rounded-lg hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out border-2 border-black"
                   >
