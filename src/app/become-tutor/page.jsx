@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
-
 import React, {useState} from "react";
 import {Button} from "antd";
 import {AiOutlineCaretUp, AiOutlineCaretDown} from "react-icons/ai";
