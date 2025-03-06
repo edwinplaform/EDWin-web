@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
 import {LoadingOutlined, PlusOutlined} from '@ant-design/icons';
 import {message, Upload} from 'antd';
-import {useUser} from "@clerk/nextjs";
 import Image from "next/image";
+import {useCurrentUser} from "@/util/auth";
+import {supabase} from "../../supabase";
 
-const ProfilePicture = () => {
-    const {user} = useUser();
+const ProfilePicture = ({setValue}) => {
+    const user = useCurrentUser();
     const [loading, setLoading] = useState(false);
-    const [imageUrl, setImageUrl] = useState(user?.imageUrl);
+    const [fileList, setFileList] = useState([]);
+    const [imageUrl, setImageUrl] = useState(null);
 
     const beforeUpload = (file) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -23,11 +25,15 @@ const ProfilePicture = () => {
         return true;
     };
 
-    const handleUpload = async (info) => {
-        const file = info.file;
+    const handleUpload = async (file) => {
+        if (!file || !file.name) {
+            console.error("Invalid file:", file);
+            message.error("Invalid file selected.");
+            return;
+        }
 
-        if (!file) return;
-
+        console.log("Uploading file:", file.name);
+        // if (!file) return;
         setLoading(true);
 
         try {
@@ -37,29 +43,57 @@ const ProfilePicture = () => {
                 return;
             }
 
-            await user.setProfileImage({file});
-            await user.reload();
+            const fileName = `profile/${user.id}_${Date.now()}_${file.name}`;
+            const {data, error} = await supabase.storage
+                .from('edwin')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
 
-            setImageUrl(user.imageUrl);
-            message.success('Profile picture uploaded successfully.');
+            if (error) {
+                console.error("----------supabase profile picture uploading err: ", error);
+                message.error("Failed to upload profile picture");
+                return false;
+            }
+
+            const {data: urlData} = supabase.storage
+                .from('edwin')
+                .getPublicUrl(fileName);
+
+            const publicURL = urlData?.publicUrl;
+
+            if (!publicURL) {
+                console.error("------------supabase profile picture url error");
+                return false;
+            }
+
+            setImageUrl(publicURL);
+
+            setFileList([{
+                name: file.name,
+                status: 'done',
+                url: publicURL,
+            }]);
+
+            setValue('profilePhotoUrl', publicURL);
+
+            message.success("Profile picture uploaded successfully.");
+            return true;
 
         } catch (err) {
-            console.log("-------------- Error uploading profile picture :", err);
-            message.error('Failed to upload profile picture!');
+            setFileList([{
+                name: file.name,
+                status: 'error',
+            }]);
+
+            console.log("-----------------err for profile photo upload: ", err);
+            message.error("Failed to upload profile photo");
+            return false;
         } finally {
             setLoading(false);
         }
     }
-
-    // const handleChange = (info) =>{
-    //     const {status} = info.file;
-    //
-    //     if (status === 'error'){
-    //         const errorMsg = info.file.response.toString();
-    //         alert(errorMsg);
-    //     }
-    // };
-
 
     const uploadButton = (
         <button
@@ -87,12 +121,11 @@ const ProfilePicture = () => {
                 className="avatar-uploader"
                 showUploadList={false}
                 beforeUpload={beforeUpload}
-                customRequest={({file, onSuccess, onError}) =>{
-                    handleUpload({file})
+                customRequest={({file, onSuccess, onError}) => {
+                    handleUpload(file)
                         .then(() => onSuccess('ok'))
                         .catch((err) => onError(err));
                 }}
-                // onChange={handleChange}
             >
                 {imageUrl ? (
                     <Image
