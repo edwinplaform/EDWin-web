@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
+import {getCurrentUser} from "@/util/auth";
 
-const userRole = "teacher";
+const user = getCurrentUser();
+const userRole = user.role.toLowerCase();
 
 const menuItems = [
     {
@@ -29,7 +31,7 @@ const menuItems = [
                 icon: "/student.png",
                 label: "Appointments",
                 href: "/portal/appointments",
-                visible: ["admin", "teacher"],
+                visible: ["teacher"],
             },
             // {
             //     icon: "/calendar.png",
@@ -83,7 +85,7 @@ const menuItems = [
                 icon: "/setting.png",
                 label: "My Account",
                 href: "/portal/settings",
-                visible: ["teacher", "student","admin"],
+                visible: ["teacher", "student"],
             },
         ],
     },
@@ -92,13 +94,13 @@ const menuItems = [
 const Menu = () => {
     return (
         <div className="mt-1 text-sm">
-            {menuItems.map((i,index) => (
+            {menuItems.map((i, index) => (
                 <div className="flex flex-col gap-2" key={index}>
                     <span className="hidden lg:block text-gray-400 font-light my-4">
                         {i.title}
                     </span>
-                    {/*{i.items.filter(item => item.visible.includes(userRole))*/}
-                    {i.items.map(item => (
+                    {i.items.filter(item => item.visible.includes(userRole))
+                        .map(item => (
                             <Link
                                 href={item.href}
                                 key={item.label}
