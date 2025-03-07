@@ -1,14 +1,24 @@
 import Image from "next/image";
 import Link from "next/link";
+import {useTutorReview} from "@/hooks/useReviews";
 
 const TutorCard = ({profile}) => {
 
+    const {data: reviews = [], isLoading: reviewsLoading} = useTutorReview(profile.id);
+
+    const averageRating = reviews.length > 0
+        ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+        : null;
+
     return (
-        <div className="bg-white rounded-3xl shadow-md m-4 w-72 hover:shadow-2xl transition-shadow">
-            <Link href={`/tutors/${profile.id}`}>
+        <Link href={`/tutors/${profile.id}`}>
+            <div className="bg-white rounded-3xl shadow-md m-4 w-72 hover:shadow-2xl transition-shadow">
                 <div className="relative">
-                    <Image src={profile.image} width="260" height="260" alt="profile photo"
-                           className="rounded-3xl w-full h-72 object-cover"/>
+                    <Image
+                        src={profile.image}
+                        width="260" height="260"
+                        alt={`${profile.name} profile`}
+                        className="rounded-3xl w-full h-72 object-cover"/>
                     <div className="absolute bottom-2 px-2 py-1 left-2">
                         <Image src="/heart.svg" width={20} height={20} alt="profile photo"/>
                     </div>
@@ -42,12 +52,12 @@ const TutorCard = ({profile}) => {
                             <Image src="/star1.svg" alt="star" width={20} height={20}/>
                         </div>
                         <p className="text-[#275e6c] font-bold">
-                            {profile.rating}
+                            {reviewsLoading ? "Loading..." : averageRating ? `${averageRating} (${reviews.length})` : "No reviews"}
                         </p>
                     </div>
                 </div>
-            </Link>
-        </div>
+            </div>
+        </Link>
     );
 }
 
