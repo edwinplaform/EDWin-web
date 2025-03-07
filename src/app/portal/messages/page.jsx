@@ -1,12 +1,14 @@
 'use client';
 
-import {useUser} from '@clerk/nextjs';
+// import {useUser} from '@clerk/nextjs';
 import Sidebar from "@/components/chat/Sidebar";
 import ChatWindow from "@/components/chat/ChatWindow";
 import {useState} from 'react';
+import {useCurrentUser} from "@/util/auth";
 
 const ChatPage = () => {
-    const {user} = useUser();
+    // const {user} = useUser();
+    const user = useCurrentUser();
     const [selectedChat, setSelectedChat] = useState(null);
 
     if (!user) return null;
@@ -23,7 +25,7 @@ const ChatPage = () => {
                     <ChatWindow
                         userId={user.id}
                         chatId={selectedChat}
-                        userName={user.firstName || ''}
+                        userName={user.name || ''}
                     />
                 </div>
             </div>
