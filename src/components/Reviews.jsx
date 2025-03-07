@@ -1,24 +1,22 @@
 import Image from "next/image";
+import moment from "moment";
+import {Rate} from "antd";
 
-const Reviews = () => {
+const Reviews = ({review}) => {
     return (
         <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">Outstanding
-                tutor</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-1">{review.title}</h2>
             <div className="flex space-x-2">
-                <p className="text-[14px]">by <b>Amal Perera</b> |</p>
-                <p className="text-[14px] opacity-60">posted on Sep 15, 2024</p>
+                <p className="text-[14px]">by <b>{review.User ? `${review.User.firstName} ${review.User.lastName}` : "Anonymous"}</b> |
+                </p>
+                <p className="text-[14px] opacity-60">posted on {moment(review.createdAt).format("MM DD, YYYY")}</p>
             </div>
             <div className="py-3">
-                <Image src="/rateStar.png" width={20} height={20} alt="rating"/>
+                {/*<Image src="/rateStar.png" width={20} height={20} alt="rating"/>*/}
+                <Rate disabled value={review.rating} className="text-yellow-500"/>
             </div>
             <div className="mb-5 text-[15px]">
-                <p className="">Ari provided my son with exactly the support he needed
-                    throughout Year 12. I have no doubt that he would not have been as
-                    settled and calm going into his Methods exam without the guidance and
-                    support of Ari over the last 6+ months. Ari was always approachable,
-                    knowledgeable, friendly and flexible. Cant recommend more highly.
-                    Thanks Ari.</p>
+                <p>{review.comment}</p>
             </div>
         </div>
     )
