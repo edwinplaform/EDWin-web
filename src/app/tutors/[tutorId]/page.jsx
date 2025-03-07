@@ -5,24 +5,29 @@ import BookForm from "@/components/BookForm";
 import Reviews from "@/components/Reviews";
 import {useUserById} from "@/hooks/useUsers";
 import {useParams} from "next/navigation";
-import {Spin} from "antd";
+import {Rate, Spin} from "antd";
 import React from "react";
+import {useTutorReview} from "@/hooks/useReviews";
 
 const Tutor = () => {
     const {tutorId} = useParams();
-
-    const {data: user, isLoading, error} = useUserById(tutorId);
+    const {data: user, isLoading, error: userError} = useUserById(tutorId);
+    const {data: reviews = [], isLoading: reviewsLoading, error: reviewsError} = useTutorReview(tutorId);
 
     console.log("---row data: ", user);
 
-    if (!tutorId || isLoading) {
-        return <div className="flex justify-center items-center py-12">
+    if (!tutorId || isLoading || reviewsLoading) {
+        return <div className="flex justify-center items-center min-h-screen">
             <Spin size="large"/>
         </div>;
     }
 
-    if (error) {
-        return <div>Error loading tutor details</div>;
+    if (userError) {
+        return <div>Error loading tutor details: {userError.message}</div>;
+    }
+
+    if (reviewsError) {
+        console.error("Error loading reviews:", reviewsError.message);
     }
 
     if (!user) {
@@ -34,6 +39,10 @@ const Tutor = () => {
     const formattedYear = `'s${yearFromCreatedAt.toString().slice(-2)}`;
     console.log(yearFromCreatedAt);
 
+    const averageRating = reviews.length > 0
+        ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+        : "No reviews";
+
     return (
         <>
             <div className="bg-bgColorWhite">
@@ -42,21 +51,24 @@ const Tutor = () => {
                         <div className="relative rounded-md h-32 w-32 md:w-64 md:h-64">
                             <Image
                                 src={user.data.profilePhotoUrl || "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg"}
-                                alt="tutor profile photo" fill objectFit="cover" />
+                                alt="tutor profile photo"
+                                fill
+                                objectFit="cover"/>
                         </div>
                         <div className="md:ml-6 mt-4 md:mt-0 text-center md:text-left">
                             <div className="flex gap-10">
                                 <div
                                     className="text-2xl text-[#275e6c] font-bold">{user.data.firstName} {user.data.lastName}</div>
                                 <div className="flex items-center justify-center md:justify-start mt-1">
-                                    <Image src="/rateStar.png" alt="" height={20} width={20}/>
-                                    <span className="ml-1 text-gray-600">5.0 (10)</span>
+                                    {/*<Image src="/rateStar.png" alt="" height={20} width={20}/>*/}
+                                    <Rate disabled value={parseFloat(averageRating)} className="text-yellow-500"/>
+                                    <span className="ml-1 text-gray-600">{averageRating} ({reviews.length})</span>
                                 </div>
                             </div>
                             <div className="flex gap-2 mt-4 justify-center md:justify-start opacity-70">
                                 <Image src="/calendar.png" alt="" width={18} height={14}/>
                                 <span
-                                    className="text-gray-600 text-[14px]">On EDWin since October {formattedYear}</span>
+                                    className="text-gray-600 text-[14px]">On EDWin since {formattedYear}</span>
                             </div>
                             <div className="flex gap-2 mt-2 justify-center md:justify-start">
                                 <Image src="/dollarSymbol.png" alt="" height={18} width={18}/>
@@ -124,15 +136,23 @@ const Tutor = () => {
                     </div>
                     <div className="mt-10 mb-20">
                         <h2 className="text-xl text-[#275e6c] font-bold">Reviews</h2>
-                        <p className="text-sm text-gray-500">5.0 (25 reviews)</p>
+                        <p className="text-sm text-gray-500">{averageRating} ({reviews.length} {reviews === 1 ? "review" : "reviews"})</p>
                         <div className="bg-white p-6 rounded-xl shadow-sm mt-4">
-                            <Reviews/>
-                            <hr className="mb-6"/>
-                            <Reviews/>
+                            {
+                                reviews.length > 0 ? (
+                                    reviews.map((review) => (
+                                        <div key={review.id}>
+                                            <Reviews review={review}/>
+                                            <hr className="mb-6"/>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No reviews yet for this tutor.</p>
+                                )
+                            }
                         </div>
                     </div>
                 </div>
-
             </div>
         </>
     );
