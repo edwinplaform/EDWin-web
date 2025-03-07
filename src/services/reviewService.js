@@ -1,5 +1,7 @@
 import axiosInstance from "@/util/axiosInstance";
 
-export const createReview = (data) => axiosInstance.post('/review', data);
+export const createReview = (data) => axiosInstance.post('/reviews', data);
 
-export const getTutorReview = (tutorId) => axiosInstance.get(`/tutors/${tutorId}/reviews`);
+export const getTutorReview = (tutorId) => axiosInstance.get(`/reviews/tutor/${tutorId}`);
+
+export const getReviewsBySessionId = (sessionId) => axiosInstance.get(`/reviews/session/${sessionId}`);
