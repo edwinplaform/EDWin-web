@@ -26,7 +26,7 @@ export default function Home() {
             }
         };
         checkUser();
-    },[]);
+    },[router]);
 
 
     return (

@@ -14,7 +14,7 @@ export const useChatUserSetup = () => {
                 id: userId,
                 first_name: userData.firstName,
                 last_name: userData.lastName,
-                avatar_url: userData.imageUrl || '/default-avatar.png',
+                avatar_url: userData.profilePhotoUrl || '/avatar.png',
                 created_at: new Date().toISOString()
             };
 

@@ -3,77 +3,59 @@ import Image from "next/image";
 import {getCurrentUser} from "@/util/auth";
 
 const user = getCurrentUser();
-const userRole = user.role.toLowerCase();
+const userRole = user?.role;
 
 const menuItems = [
     {
         title: "MENU",
         items: [
-            // {
-            //     icon: "/home.png",
-            //     label: "Home",
-            //     href: "/",
-            //     visible: ["admin", "teacher", "student", "parent"],
-            // },
             {
                 icon: "/message.png",
                 label: "Messages",
                 href: "/portal/messages",
-                visible: ["teacher", "student"],
+                visible: ["TUTOR", "STUDENT"],
             },
             {
                 icon: "/tutor.png",
                 label: "Teachers",
                 href: "/portal/tutors",
-                visible: ["admin"],
+                visible: ["ADMIN"],
             },
             {
                 icon: "/student.png",
                 label: "Appointments",
                 href: "/portal/appointments",
-                visible: ["teacher"],
+                visible: ["TUTOR"],
             },
-            // {
-            //     icon: "/calendar.png",
-            //     label: "Subjects",
-            //     href: "/portal/subjects",
-            //     visible: ["teacher"],
-            // },
-            // {
-            //     icon: "/lesson.png",
-            //     label: "Lessons",
-            //     href: "/portal/lessons",
-            //     visible: ["student"],
-            // },
             {
                 icon: "/lesson.png",
                 label: "My Classes",
                 href: "/portal/students/classes",
-                visible: ["student"],
+                visible: ["STUDENT"],
             },
             {
                 icon: "/lesson.png",
                 label: "My Classes",
                 href: "/portal/tutors/classes",
-                visible: ["teacher"],
+                visible: ["TUTOR"],
             },
             {
                 icon: "/invoice.png",
                 label: "Invoice",
                 href: "/portal/invoices",
-                visible: ["student"],
+                visible: ["STUDENT"],
             },
             {
                 icon: "/calendar.png",
                 label: "Schedule",
                 href: "/portal/schedule",
-                visible: ["teacher", "student"],
+                visible: ["TUTOR", "STUDENT"],
             },
             {
                 icon: "/payment.png",
                 label: "Payment",
                 href: "/portal/payments",
-                visible: ["teacher"],
+                visible: ["TUTOR"],
             },
 
         ],
@@ -85,7 +67,7 @@ const menuItems = [
                 icon: "/setting.png",
                 label: "My Account",
                 href: "/portal/settings",
-                visible: ["teacher", "student"],
+                visible: ["TUTOR", "STUDENT"],
             },
         ],
     },
