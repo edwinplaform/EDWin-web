@@ -27,7 +27,7 @@ function ContactUs() {
           transition={{ duration: 3 }}
           className="text-xl md:text-2xl mt-3 text-white drop-shadow-lg"
         >
-          Let's Have a Talk
+          Let&apos;s Have a Talk
         </motion.p>
       </div>
 
@@ -97,7 +97,7 @@ function ContactUs() {
           />
         </motion.div>
       </div>
-      
+
       <div className="flex flex-col items-center justify-center mt-2 sm:mt-10">
         <motion.div
           className="flex items-center justify-center"
@@ -187,7 +187,7 @@ function ContactUs() {
             width="100%"
             height="600"
             style={{ border: "0" }}
-            scrolling="no"   
+            scrolling="no"
             src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Keenagahena,Dalkada,%20Bombuwala,%20Kalutara%20South,%20Sri%20Lanka+(EDWin)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
             allowFullScreen
             loading="lazy"
