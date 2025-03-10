@@ -1,29 +1,16 @@
 "use client";
 
 import React from "react";
-// import { UserButton, UserProfile } from "@clerk/nextjs";
 import { useState } from "react";
 import { Button, Select } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
-import Image from "next/image";
-// import {UserButton, UserProfile} from "@clerk/nextjs";
-//
-// const DotIcon = () => {
-//     return (
-//         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
-//             <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" />
-//         </svg>
-//     )
-// }
-//
-// const CustomPage = () => {
-//     return (
-//         <div>
-//             <h1>Custom Profile Page</h1>
-//             <p>This is the custom profile page</p>
-//         </div>
-//     )
-// }
+import {
+  useUpdateBankDetails,
+  useUpdatePassword,
+  useUpdateUser,
+  useUserById,
+} from "@/hooks/useUsers";
+import { useCurrentUser } from "@/util/auth";
 
 const Settings = () => {
   const BANKS = [
@@ -41,11 +28,57 @@ const Settings = () => {
     "Union Bank",
   ];
 
-  const [bankDetails, setBankDetails] = useState("1234-5678-9012-3456");
-  const [imageSrc, setImageSrc] = useState("/user2.jpg");
+  const user = useCurrentUser();
+  const userId = user?.id;
+  const {
+    data: userData,
+    error: userError,
+    isLoading: isUserLoading,
+  } = useUserById(userId);
+
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [branch, setBranch] = useState("");
+  const [bank, setBank] = useState("");
   const [view, setView] = useState("account");
-  const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState(userData?.data.firstName);
+  const [lastName, setLastName] = useState(userData?.data.firstName);
+  const [phone, setPhone] = useState(userData?.data.phone);
+  const [address, setAddress] = useState(userData?.data.address);
+  const [description, setDescription] = useState(
+    userData?.data.Tutor.description
+  );
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState(
+    userData?.data.profilePhotoUrl
+  );
+  const [error, setError] = useState("");
   const [visible, setVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const useUpdatePasswordMutation = useUpdatePassword();
+  const useUpdateBankDetailsMutation = useUpdateBankDetails();
+  const useUpdateUserMutation = useUpdateUser();
+
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     try {
+  //       const response = await fetch(`/settings/${userId}`);
+  //       const data = await response.json();
+  //       setUserData(data);
+  //     } catch (error) {
+  //       console.error("Error fetching user data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   if (userId) {
+  //     fetchUserData();
+  //   }
+  // }, [userId]);
 
   const handlePasswordClick = () => {
     setView("password");
@@ -55,8 +88,26 @@ const Settings = () => {
     setView("account");
   };
 
-  const handleUpdateBankDetails = () => {
-    setBankDetails(bankDetails);
+  const handleUpdateBankDetails = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await useUpdateBankDetailsMutation.mutateAsync({
+        bankDetails: {
+          accountName,
+          accountNumber,
+          bank,
+          branch,
+        },
+      });
+    } catch (error) {
+      setError(error.response?.data?.message || "Unsuccesfull !!!");
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleImageChange = (event) => {
@@ -64,13 +115,67 @@ const Settings = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImageSrc(e.target.result);
+        setProfilePhotoUrl(e.target.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  let role = "TUTOR";
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await useUpdateUserMutation.mutateAsync({
+        userData: {
+          firstName,
+          lastName,
+          address,
+          phone,
+          profilePhotoUrl,
+          description,
+        },
+      });
+    } catch (error) {
+      setError(error.response?.data?.message || "Unsuccesfull !!!");
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    if (confirmPassword !== newPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await useUpdatePasswordMutation.mutateAsync({
+        password: {
+          oldPassword,
+          newPassword,
+        },
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || "Unsuccesfull !!!");
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (userError) {
+    return <div>Error loading tutor details</div>;
+  }
+
+  let role = "STUDENT";
 
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4">
@@ -79,9 +184,11 @@ const Settings = () => {
         <div className="flex p-3 ml-12 lg:flex-row sm:flex-col">
           <div className="flex flex-col items-center text-center mt-10 w-full lg:w-1/4 lg:sticky">
             <div>
-              {/*<Image src={imageSrc} width={40} height={40} />*/}
               <img
-                src={imageSrc}
+                src={
+                  profilePhotoUrl ||
+                  "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg"
+                }
                 alt="User Image"
                 className="mb-4  w-40 lg:w-56 rounded-full shadow-md"
               />
@@ -130,7 +237,7 @@ const Settings = () => {
             {view === "account" && (
               <div>
                 <h2 className="text-xl font-semibold text-gray-700 mb-6">
-                  Account Settings
+                  Profile
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div className="flex flex-col">
@@ -143,6 +250,8 @@ const Settings = () => {
                     <input
                       id="firstName"
                       type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       maxLength={20}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
@@ -157,6 +266,8 @@ const Settings = () => {
                     <input
                       id="lastName"
                       type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       maxLength={20}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
@@ -165,12 +276,14 @@ const Settings = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div className="flex flex-col">
-                    <label htmlFor="email" className="text-sm font-medium mb-2">
-                      Email
+                    <label htmlFor="phone" className="text-sm font-medium mb-2">
+                      Phone
                     </label>
                     <input
-                      id="email"
-                      type="email"
+                      id="phone"
+                      type="text"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
                   </div>
@@ -184,15 +297,45 @@ const Settings = () => {
                     <input
                       id="address"
                       type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
+                  </div>
+                </div>
+                {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="subject"
+                      className="text-sm font-medium mb-2"
+                    >
+                      Subject
+                    </label>
+                    <input
+                      id="subject"
+                      type="text"
+                      className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+                    />
+                  </div>
+                </div> */}
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-6 mb-6">
+                  <div className="flex flex-col">
+                    <label htmlFor="desc" className="text-sm font-medium mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      id="desc"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="w-full h-32 resize-none rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+                    ></textarea>
                   </div>
                 </div>
 
                 <div className="flex gap-4 mt-6">
                   <button
                     type="button"
-                    onClick={handleUpdateBankDetails} // Update bank details directly
+                    onClick={handleUpdateUser} // Update bank details directly
                     className="w-52 bg-black text-white my-1 rounded-md text-sm p-[10px]"
                   >
                     UPDATE
@@ -222,6 +365,8 @@ const Settings = () => {
                   <div className="flex">
                     <input
                       id="currentPassword"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
                       type={visible ? "text" : "password"}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
@@ -244,6 +389,8 @@ const Settings = () => {
                   <div className="flex">
                     <input
                       id="newPassword"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
                       type={visible ? "text" : "password"}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
@@ -266,6 +413,8 @@ const Settings = () => {
                   <div className="flex">
                     <input
                       id="confirmPassword"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       type={visible ? "text" : "password"}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
@@ -277,10 +426,13 @@ const Settings = () => {
                     </div>
                   </div>
                 </div>
-
+                {error && (
+                  <div className="block text-sm text-red-400">{error}</div>
+                )}
                 <div className="flex gap-4 mt-6">
                   <button
                     type="button"
+                    onClick={handleChangePassword}
                     className="w-52 bg-black text-white my-1 rounded-md text-sm p-[10px]"
                   >
                     Save New Password
@@ -298,6 +450,9 @@ const Settings = () => {
 
             {view == "billing" && (
               <div>
+                <h2 className="text-xl font-semibold text-gray-700 mb-6">
+                  Billing Details
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div className="flex flex-col">
                     <label
@@ -310,6 +465,8 @@ const Settings = () => {
                       id="nameBank"
                       type="text"
                       maxLength={30}
+                      value={accountName}
+                      onChange={(e) => setAccountName(e.target.value)}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
                   </div>
@@ -324,10 +481,29 @@ const Settings = () => {
                           value: bank,
                         };
                       })}
+                      value={bank}
+                      onChange={(value) => setBank(value)}
                     ></Select>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                  <div className="flex flex-col mb-6">
+                    <label
+                      htmlFor="branch"
+                      className="text-sm font-medium mb-2"
+                    >
+                      Branch
+                    </label>
+                    <input
+                      id="branch"
+                      type="text"
+                      maxLength={30}
+                      value={branch}
+                      onChange={(e) => setBranch(e.target.value)}
+                      className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+                    />
+                  </div>
+
                   <div className="flex flex-col mb-6">
                     <label
                       htmlFor="accountNum"
@@ -339,6 +515,8 @@ const Settings = () => {
                       id="accountNum"
                       type="text"
                       maxLength={30}
+                      value={accountNumber}
+                      onChange={(e) => setAccountNumber(e.target.value)}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
                     />
                     {/* <input
@@ -375,22 +553,41 @@ const Settings = () => {
       {role === "STUDENT" && (
         <div className="flex p-3 ml-12 lg:flex-row sm:flex-col">
           <div className="flex flex-col items-center text-center mt-10 w-full lg:w-1/4 lg:sticky">
-            <div>
-              <p className="mt-4 text-medium text-black font-bold">
-                Rachel Daves
-              </p>
+          <div>
+              <img
+                src={
+                  profilePhotoUrl ||
+                  "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg"
+                }
+                alt="User Image"
+                className="mb-4  w-40 lg:w-56 rounded-full shadow-md"
+              />
+              <label
+                htmlFor="imageUpload"
+                className="mt-4 bg-gray-800 text-white text-sm px-5 py-2 rounded-full cursor-pointer hover:bg-gray-700"
+              >
+                Change
+              </label>
+              <input
+                id="imageUpload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+              <p className="mt-4 font-semibold text-base">{firstName + " " + lastName}</p>
             </div>
-
             <div className="grid grid-cols-1 divide-y divide-neutral-300 border border-neutral-200 mt-8 w-full rounded-lg shadow-sm">
+              {/* <div className="grid grid-cols-1 divide-y divide-neutral-300 border border-neutral-200 mt-8 w-full rounded-lg shadow-sm"> */}
               <div
-                className="text-medium p-4 hover:font-medium hover:bg-blue-100 transition-all cursor-pointer"
+                className="text-sm p-3 hover:font-medium hover:bg-gray-100 transition-all cursor-pointer"
                 aria-label="Account"
                 onClick={() => setView("account")}
               >
                 Account
               </div>
               <div
-                className="text-medium p-4 hover:font-medium hover:bg-blue-100 transition-all cursor-pointer"
+                className="text-sm p-3 hover:font-medium hover:bg-gray-100 transition-all cursor-pointer"
                 aria-label="Password"
                 onClick={handlePasswordClick}
               >
@@ -401,9 +598,9 @@ const Settings = () => {
 
           <div className="lg:w-2/3 sm:w-full bg-white shadow-lg rounded-lg p-8 mx-auto my-5">
             {view === "account" ? (
-              <>
+              <div>
                 <h2 className="text-xl font-semibold text-gray-700 mb-6">
-                  Account Settings
+                  Profile
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div className="flex flex-col">
@@ -417,8 +614,9 @@ const Settings = () => {
                       id="firstName"
                       type="text"
                       maxLength={20}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                      //   className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition-all w-full"
                     />
                   </div>
                   <div className="flex flex-col">
@@ -432,12 +630,26 @@ const Settings = () => {
                       id="lastName"
                       type="text"
                       maxLength={20}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                      //   className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition-all w-full"
                     />
                   </div>
                 </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                  <div className="flex flex-col">
+                    <label htmlFor="phone" className="text-sm font-medium mb-2">
+                      Phone
+                    </label>
+                    <input
+                      id="phone"
+                      type="text"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+                    />
+                  </div>
                   <div className="flex flex-col">
                     <label
                       htmlFor="address"
@@ -448,53 +660,43 @@ const Settings = () => {
                     <input
                       id="address"
                       type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                      //   className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition w-full"
                     />
                   </div>
-                  {/* <div className="flex flex-col">
-                          <label htmlFor="phone" className="text-sm font-medium mb-2">
-                            Phone Number
-                          </label>
-                          <input
-                            id="phone"
-                            type="tel"
-                            className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                            //   className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition-all w-full"
-                          />
-                        </div> */}
                 </div>
-                <div className="flex flex-col mb-6">
-                  <label htmlFor="bio" className="text-sm font-medium mb-2">
-                    Bio
-                  </label>
-                  <textarea
-                    id="bio"
-                    rows={4}
-                    maxLength={500}
-                    className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                    // className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition-all w-full"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-6 mb-6">
+                  <div className="flex flex-col">
+                    <label htmlFor="desc" className="text-sm font-medium mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      id="desc"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="w-full h-32 resize-none rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+                    ></textarea>
+                  </div>
                 </div>
                 <div className="flex gap-4 mt-6">
                   <button
                     type="button"
+                    onClick={handleUpdateUser}
                     className="w-52 bg-black text-white my-1 rounded-md text-sm p-[10px]"
-                    //className="bg-blue-500 text-white text-m font-semibold p-4 w-64 rounded-lg hover:bg-blue-600 hover:font-bold transition duration-200 ease-in-out shadow-md"
                   >
                     UPDATE
                   </button>
                   <button
                     type="button"
                     className="w-52 my-1 rounded-md text-sm p-[10px] rounded-lg hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out border-2 border-black"
-                    //className="bg-gray-100 text-gray-700 text-m font-semibold p-4 w-64 rounded-lg hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out shadow-md border-2 border-gray-300"
                   >
                     Cancel
                   </button>
                 </div>
-              </>
+              </div>
             ) : (
-              <>
+              <div>
                 <h2 className="text-xl font-semibold text-gray-700 mb-6">
                   Reset Password
                 </h2>
@@ -509,12 +711,13 @@ const Settings = () => {
                   <div className="flex">
                     <input
                       id="currentPassword"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
                       type={visible ? "text" : "password"}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                      // className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition-all w-full pr-10"
                     />
                     <div
-                      className=" cursor-pointer text-gray-600 p-3"
+                      className=" cursor-pointer text-gray-600 px-3"
                       onClick={() => setVisible(!visible)}
                     >
                       {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
@@ -531,13 +734,14 @@ const Settings = () => {
                   </label>
                   <div className="flex">
                     <input
-                      id="currentPassword"
+                      id="newPassword"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
                       type={visible ? "text" : "password"}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                      //className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition-all w-full pr-10"
                     />
                     <div
-                      className=" cursor-pointer text-gray-600 p-3"
+                      className="cursor-pointer text-gray-600 px-3"
                       onClick={() => setVisible(!visible)}
                     >
                       {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
@@ -554,38 +758,134 @@ const Settings = () => {
                   </label>
                   <div className="flex">
                     <input
-                      id="currentPassword"
+                      id="confirmPassword"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       type={visible ? "text" : "password"}
                       className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                      //className="p-3 rounded-lg border border-gray-300 hover:border-gray-400 transition-all w-full pr-10"
                     />
                     <div
-                      className=" cursor-pointer text-gray-600 p-3"
+                      className="cursor-pointer text-gray-600 px-3"
                       onClick={() => setVisible(!visible)}
                     >
                       {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
                     </div>
                   </div>
                 </div>
-
+                {error && (
+                  <div className="block text-sm text-red-400">{error}</div>
+                )}
                 <div className="flex gap-4 mt-6">
                   <button
                     type="button"
+                    onClick={handleChangePassword}
                     className="w-52 bg-black text-white my-1 rounded-md text-sm p-[10px]"
-                    //className="bg-blue-500 text-white text-m font-semibold p-4 w-64 rounded-lg hover:bg-blue-600 hover:font-bold transition duration-200 ease-in-out shadow-md"
                   >
                     Save New Password
                   </button>
                   <button
                     type="button"
-                    onClick={handleBackToAccount}
-                    className="w-52 my-1 rounded-md text-sm p-[10px] rounded-lg hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out border-2 border-black"
-                    //className="bg-gray-100 text-gray-700 text-m font-semibold p-4 w-64 rounded-lg hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out shadow-md border-2 border-gray-300"
+                    onClick={() => setView("account")}
+                    className="w-52 my-1  text-sm p-[10px] rounded-md hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out border-2 border-black"
                   >
                     Cancel
                   </button>
                 </div>
-              </>
+              </div>
+              // <div>
+              //   <h2 className="text-xl font-semibold text-gray-700 mb-6">
+              //     Reset Password
+              //   </h2>
+
+              //   <div className="flex flex-col mb-6 relative">
+              //     <label
+              //       htmlFor="currentPassword"
+              //       className="text-sm font-medium mb-2"
+              //     >
+              //       Current Password
+              //     </label>
+              //     <div className="flex">
+              //       <input
+              //         id="currentPassword"
+              //         type={visible ? "text" : "password"}
+              //         value={oldPassword}
+              //         onChange={(e) => setOldPassword(e.target.value)}
+              //         className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+              //       />
+              //       <div
+              //         className=" cursor-pointer text-gray-600 px-3"
+              //         onClick={() => setVisible(!visible)}
+              //       >
+              //         {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+              //       </div>
+              //     </div>
+              //   </div>
+
+              //   <div className="flex flex-col mb-6">
+              //     <label
+              //       htmlFor="newPassword"
+              //       className="text-sm font-medium mb-2"
+              //     >
+              //       New Password
+              //     </label>
+              //     <div className="flex">
+              //       <input
+              //         id="newPassword"
+              //         type={visible ? "text" : "password"}
+              //         value={newPassword}
+              //         onChange={(e) => setNewPassword(e.target.value)}
+              //         className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+              //       />
+              //       <div
+              //         className="cursor-pointer text-gray-600 px-3"
+              //         onClick={() => setVisible(!visible)}
+              //       >
+              //         {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+              //       </div>
+              //     </div>
+              //   </div>
+
+              //   <div className="flex flex-col mb-6">
+              //     <label
+              //       htmlFor="confirmPassword"
+              //       className="text-sm font-medium mb-2"
+              //     >
+              //       Confirm New Password
+              //     </label>
+              //     <div className="flex">
+              //       <input
+              //         id="confirmPassword"
+              //         type={visible ? "text" : "password"}
+              //         value={confirmPassword}
+              //         onChange={(e) => setConfirmPassword(e.target.value)}
+              //         className="w-full rounded-md bg-white px-3.5 py-2 text-sm outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-[1.5px] focus:ring-zinc-950 data-[invalid]:ring-red-400"
+              //       />
+              //       <div
+              //         className="cursor-pointer text-gray-600 px-3"
+              //         onClick={() => setVisible(!visible)}
+              //       >
+              //         {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+              //       </div>
+              //     </div>
+              //   </div>
+
+              //   <div className="flex gap-4 mt-6">
+              //     <button
+              //       type="button"
+              //       onClick={handleChangePassword}
+              //       className="w-52 bg-black text-white my-1 rounded-md text-sm p-[10px]"
+              //     >
+              //       Save New Password
+              //     </button>
+              //     <button
+              //       type="button"
+              //       onClick={() => setView("account")}
+              //       className="w-52 my-1 rounded-md text-sm p-[10px] rounded-lg hover:bg-red-200 hover:font-bold transition duration-200 ease-in-out border-2 border-black"
+              //     >
+              //       Cancel
+              //     </button>
+              //   </div>
+              // </div>
             )}
           </div>
         </div>

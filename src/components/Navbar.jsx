@@ -102,7 +102,7 @@ const Nav = () => {
                                     Login
                                 </Link>
                                 <Link
-                                    href="/register"
+                                    href="/signup"
                                     className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition duration-150"
                                 >
                                     Register
