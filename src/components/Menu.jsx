@@ -1,9 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import {getCurrentUser} from "@/util/auth";
-
-const user = getCurrentUser();
-const userRole = user?.role;
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 
 const menuItems = [
     {
@@ -73,7 +71,11 @@ const menuItems = [
     },
 ];
 
-const Menu = () => {
+const Menu = async () => {
+
+    const session = await getServerSession(authOptions);
+    const userRole = session?.user?.role;
+
     return (
         <div className="mt-1 text-sm">
             {menuItems.map((i, index) => (
