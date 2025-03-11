@@ -7,14 +7,15 @@ import InputField from "@/components/InputField";
 import React, {useState} from 'react';
 import {motion} from 'framer-motion'
 import Image from "next/image";
-import Link from "next/link";
 import Upload from "@/components/Upload";
 import AvailabilitySection from "@/components/AvailabilitySection";
 import ProfilePicture from "@/components/ProfilePicture";
 import {message} from "antd";
-import {useCreateUser, useUpdateUser, useUpgradeRole} from "@/hooks/useUsers";
+import {useUpdateUser} from "@/hooks/useUsers";
 import {useChatUserSetup} from "@/hooks/useChatUserSetup";
 import {useCurrentUser} from "@/util/auth";
+import {signIn, signOut, useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
@@ -29,16 +30,6 @@ const schema = z.object({
             institute: z.string().min(1, {message: "Institute is required!"})
         })
     ).min(1, {message: "At least one qualification is required!"}),
-    // description: z.string().min(1, {message: "Description is required!"}),
-    // certificate: z.instanceof(File).refine(file => file.size <= 5 * 1024 * 1024, {
-    //     message: "File size must be less than 5MB"
-    // })
-    //     .refine(file => ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type), {
-    //         message: "Only PDF, JPEG, and PNG files are allowed",
-    //     })
-    //     .refine(file => file !== undefined && file !== null, {
-    //         message:"Certificate file is required!"
-    //     }),
     certificateUrl: z.string().url().optional(),
     currency: z.enum(["LKR", "USD"], {message: "Currency is required!"}),
     availability: z.object({
@@ -55,7 +46,9 @@ const OnBoarding = () => {
 
     const user = useCurrentUser();
     const userId = user?.id;
-    console.log("--------userId: ",userId);
+    console.log("--------userId: ", userId);
+    const {data: session, update} = useSession();
+    const router = useRouter();
 
     const {
         register,
@@ -84,6 +77,7 @@ const OnBoarding = () => {
     const [step, setStep] = useState(1);
     const [certificate, setCertificate] = useState(null);
     const [formData, setFormData] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
         fields: subjectFields,
@@ -104,7 +98,7 @@ const OnBoarding = () => {
     });
 
     const updateUserMutation = useUpdateUser();
-    const {setupChatUser,isCreatingChatUser,chatUserError} = useChatUserSetup();
+    const {setupChatUser, isCreatingChatUser, chatUserError} = useChatUserSetup();
 
     const nextStep = async () => {
         let isValid = false;
@@ -136,13 +130,14 @@ const OnBoarding = () => {
     };
 
     const onSubmit = async (data) => {
+        setIsSubmitting(true);
         try {
             console.log(data);
-            const chatUserSuccess = await setupChatUser(userId,{
+            const chatUserSuccess = await setupChatUser(userId, {
                 ...data,
             });
 
-            if (!chatUserSuccess){
+            if (!chatUserSuccess) {
                 message.error("Failed to set up chat profile");
                 return;
             }
@@ -156,31 +151,45 @@ const OnBoarding = () => {
                 role: "TUTOR"
             };
 
-            await updateUserMutation.mutateAsync({userId, userData: submissionData}, {
-                onSuccess: () => {
-                    console.log("User successfully created");
-                    setStep(5);
-                    // upgradeRoleMutation.mutate(
-                    //     {userId: userId, role: role(user), isOnboarding: true},
-                    //     {
-                    //         onSuccess: () => {
-                    //             console.log("User role upgraded successfully!");
-                    //
-                    //         },
-                    //         onError: (error) => {
-                    //             console.error("Error upgrading role:", error);
-                    //             message.error("Error upgrading role");
-                    //         }
-                    //     }
-                    // );
-                },
-                onError: (error) => {
-                    console.error("Error creating user:", error);
-                    message.error("Error creating user");
-                }
-            });
+            const response = await updateUserMutation.mutateAsync({userId, userData: submissionData});
+            const newToken = response.accessToken;
+            if (newToken) {
+                const updatedSession = {
+                    ...session,
+                    user: {
+                        ...session.user,
+                        id: response.user.userId,
+                        name: `${response.user.firstName} ${response.user.lastName}`,
+                        role: response.user.role,
+                        isOnboarding: response.user.isOnboarding,
+                        image: response.user.profilePhotoUrl,
+                    },
+                    accessToken: newToken,
+                };
+                await update(updatedSession);
+                localStorage.setItem("next-auth.session-token", newToken);
+                setStep(5);
+                message.success("Profile submitted successfully!");
+            } else {
+                throw new Error("No access token returned from server");
+            }
+
         } catch (err) {
             console.log("------------submit err: ", err);
+            message.error("An error occurred. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleLetsGo = async () => {
+        await signOut({redirect: false});
+        const newToken = session?.accessToken || localStorage.getItem("next-auth.session-token");
+        if (newToken && !await signIn("credentials", {token: newToken, redirect: false})?.error) {
+            router.push("/portal/messages");
+        } else {
+            message.success("Please log in again.");
+            router.push("/login");
         }
     };
 
@@ -192,9 +201,6 @@ const OnBoarding = () => {
     return (
         <div className="relative min-h-screen flex bg-gradient-to-r from-blue-500 to-purple-500">
             <div className="max-w-screen-xl mx-auto my-auto relative flex flex-col w-4/5">
-                {/*<div className="mt-4 w-full h-2" style={{backgroundColor: '#e0cfc8'}}>*/}
-                {/*    <div className="h-full bg-black rounded-3xl w-1/3"></div>*/}
-                {/*</div>*/}
                 <form onSubmit={handleSubmit(onSubmit, (errors) => {
                     console.error("---------------err: ", errors)
                 })}
@@ -484,8 +490,9 @@ const OnBoarding = () => {
                                     Previous
                                 </button>
                                 <button type="submit"
-                                        className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
-                                    Submit
+                                        disabled={isSubmitting}
+                                        className={`mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}>
+                                    {isSubmitting ? "Submitting..." : "Submit"}
                                 </button>
                             </div>
                         </motion.div>
@@ -506,12 +513,11 @@ const OnBoarding = () => {
                             </div>
                             <div>
                                 <div className="flex justify-center mt-12">
-                                    <Link href="/portal/tutors">
-                                        <button type="button"
-                                                className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
-                                            Close
-                                        </button>
-                                    </Link>
+                                    <button type="button"
+                                            onClick={handleLetsGo}
+                                            className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
+                                        Let&apos;s Go!
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>

@@ -10,9 +10,6 @@ const TutorChatModal = ({isOpen, onClose, tutorId, studentId, studentName}) => {
     const [chatId, setChatId] = useState(null);
     const messageEndRef = useRef(null);
 
-    const tutor = "user_2qFEXIj6bQcfU40oNBTKcNXt6iD";
-    const student = "user_2o1zOxzDt5MfGgkSANe96MUqsqi";
-
     useEffect(() => {
         if (!isOpen || !tutorId || !studentId) return;
 

@@ -7,11 +7,15 @@ import {useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import Image from "next/image";
-import Link from "next/link";
+
+;
 import {message} from "antd";
-import {useCreateUser, useUpdateUser, useUpgradeRole} from "@/hooks/useUsers";
+import {useUpdateUser} from "@/hooks/useUsers";
 import {useChatUserSetup} from "@/hooks/useChatUserSetup";
 import {useCurrentUser} from "@/util/auth";
+import ProfilePicture from "@/components/ProfilePicture";
+import {signIn, signOut, useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
 
 const schema = z.object({
     firstName: z.string().min(1, {message: "First name is required!"}),
@@ -19,12 +23,15 @@ const schema = z.object({
     phone: z.string().min(9, {message: "Valid phone number is required!"}),
     address: z.string().min(1, {message: "Address is required!"}),
     subjects: z.array(z.string().min(1, {message: "Subject is required!"})),
+    profilePhotoUrl: z.string().url({message: "Valid URL is required!"}).optional()
 });
 
 const StudentOnboarding = () => {
     const user = useCurrentUser();
     const userId = user?.id;
     console.log("------------id: ", userId);
+    const {data: session, update} = useSession();
+    const router = useRouter();
 
     const {
         register,
@@ -43,6 +50,7 @@ const StudentOnboarding = () => {
 
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
         fields: subjectFields,
@@ -53,36 +61,30 @@ const StudentOnboarding = () => {
         name: "subjects"
     });
 
-    // const createUserMutation = useCreateUser();
     const updateUserMutation = useUpdateUser();
-    // const upgradeRoleMutation = useUpgradeRole();
     const {setupChatUser, isCreatingChatUser, chatUserError} = useChatUserSetup();
 
     const nextStep = async () => {
-        let isValid = false;
-        switch (step) {
-            case 1:
-                isValid = await trigger(["firstName", "lastName", "phone", "address", "subjects"]);
-                break;
-            default:
-                isValid = true;
-        }
+        const fieldsToValidate = step === 1
+            ? ["firstName", "lastName", "phone", "address", "subjects"]
+            : ["profilePhotoUrl"];
+        const isValid = await trigger(fieldsToValidate);
         if (isValid) {
             const currentStepData = getValues();
-            setFormData(prev => ({...prev, ...currentStepData}));
-            setStep(prev => prev + 1);
+            setFormData((prev) => ({...prev, ...currentStepData}));
+            setStep((prev) => prev + 1);
         }
-    }
+    };
 
     const prevStep = () => {
         setStep(step - 1);
     };
 
     const onSubmit = async (data) => {
+        setIsSubmitting(true);
         try {
             const chatUserSuccess = await setupChatUser(userId, {
                 ...data,
-                imageUrl: user?.imageUrl
             });
 
             if (!chatUserSuccess) {
@@ -94,22 +96,56 @@ const StudentOnboarding = () => {
                 ...formData,
                 ...data,
                 createdAt: new Date(),
-                role:"STUDENT",
+                role: "STUDENT",
                 isOnboarding: true
             };
 
-            await updateUserMutation.mutateAsync({userId, userData: submissionData}, {
-                onSuccess: () => {
-                    console.log("user successfully created");
-                    setStep(2);
-                },
-                onError: (error) => {
-                    console.error("Error creating user:", error);
-                    message.error("Error creating user");
+            const response = await updateUserMutation.mutateAsync({
+                    userId, userData: submissionData
+                }, {
+                    onError: (error) => {
+                        throw new Error("Error updating user: " + error.message);
+                    },
                 }
-            });
+            );
+
+            const newToken = response.accessToken;
+            if (newToken) {
+                const updatedSession = {
+                    ...session,
+                    user: {
+                        ...session.user,
+                        id: response.user.userId,
+                        name: `${response.user.firstName} ${response.user.lastName}`,
+                        role: response.user.role,
+                        isOnboarding: response.user.isOnboarding,
+                        image: response.user.profilePhotoUrl,
+                    },
+                    accessToken: newToken,
+                }
+                await update(updatedSession);
+                localStorage.setItem("next-auth.session-token", newToken);
+                setStep(3);
+                message.success("Profile created successfully!");
+            } else {
+                throw new Error("No access token returned from server");
+            }
         } catch (err) {
-            console.log("------------submit err: ", err);
+            console.error("Submit error:", err);
+            message.error("An unexpected error occurred. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleLetsGo = async () => {
+        await signOut({redirect: false});
+        const newToken = session?.accessToken || localStorage.getItem("next-auth.session-token");
+        if (newToken && !await signIn("credentials", {token: newToken, redirect: false})?.error) {
+            router.push("/portal/messages");
+        } else {
+            message.success("Please log in again.");
+            router.push("/login");
         }
     };
 
@@ -129,7 +165,7 @@ const StudentOnboarding = () => {
                             transition={{duration: 0.3}}
                             className="md:w-3/5 mx-auto py-12 space-y-2">
                             <div className="text-sm font-light text-gray-400 uppercase">
-                                Step 1 of 2
+                                Step 1 of 3
                             </div>
                             <h1 className="text-lg font-bold">Student Profile Details</h1>
                             <p className="text-sm text-gray-500">Please fill in the details below to create your student
@@ -206,15 +242,46 @@ const StudentOnboarding = () => {
                                     </text>
                                 </div>
                             </div>
-                            <div className="flex justify-end mt-12">
-                                <button type="submit"
+                            <div className="flex mt-4 justify-end">
+                                <button type="button" onClick={nextStep}
                                         className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
-                                    Submit
+                                    Next
                                 </button>
                             </div>
                         </motion.div>
                     )}
                     {step === 2 && (
+                        <motion.div
+                            key={step}
+                            initial={{opacity: 0, y: 20}}
+                            animate={{opacity: 1, y: 0}}
+                            exit={{opacity: 0, y: -20}}
+                            transition={{duration: 0.3}}
+                            className="md:w-3/5 w-3/5 mx-auto py-12">
+                            <div className="text-sm font-light text-gray-400 uppercase">
+                                Step 2 of 3
+                            </div>
+                            <h1 className="text-lg font-bold mt-2">Public Profile</h1>
+                            <p className="text-sm text-gray-500">Now create your public profile which will be shown to
+                                prospective tutors and peers on EDWin.</p>
+                            <div className="my-6 mb-5">
+                                <h1 className="text-xs text-gray-500">Add display picture*</h1>
+                                <ProfilePicture setValue={setValue}/>
+                            </div>
+                            <div className="flex justify-between mt-12">
+                                <button type="button" onClick={prevStep}
+                                        className="mt-4 bg-gray-100 text-gray-600 font-bold py-2 px-4 rounded">
+                                    Previous
+                                </button>
+                                <button type="submit"
+                                        disabled={isSubmitting}
+                                        className={`mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}>
+                                    {isSubmitting ? "Submitting..." : "Submit"}
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                    {step === 3 && (
                         <motion.div
                             key={step}
                             initial={{opacity: 0, y: 20}}
@@ -232,12 +299,11 @@ const StudentOnboarding = () => {
                             </div>
                             <div>
                                 <div className="flex justify-center mt-12">
-                                    <Link href="/portal/tutors">
-                                        <button type="button"
-                                                className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
-                                            Let&apos;s Go!
-                                        </button>
-                                    </Link>
+                                    <button type="button"
+                                            onClick={handleLetsGo}
+                                            className="mt-4 bg-red-100 text-red-400 font-bold py-2 px-4 rounded shadow hover:bg-red-200 transition duration-200">
+                                        Let&apos;s Go!
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>

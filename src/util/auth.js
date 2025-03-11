@@ -12,7 +12,7 @@ export const getServerAuthSession = async (req) => {
 
 export const getCurrentUser = async () => {
     const session = await getSession();
-    return session?.user || null ;
+    return session?.user || null;
 }
 
 export const getUserRole = async () => {

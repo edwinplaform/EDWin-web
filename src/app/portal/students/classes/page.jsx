@@ -392,9 +392,9 @@ import moment from "moment/moment";
 import {useCurrentUser} from "@/util/auth";
 
 const StudentSession = () => {
-    // const studentId = "user_2qFEXIj6bQcfU40oNBTKcNXt6iD";
-    const user = useCurrentUser();
-    const studentId = user.id;
+    const studentId = "user_2qFEXIj6bQcfU40oNBTKcNXt6iD";
+    // const user = useCurrentUser();
+    // const studentId = user.id;
     console.log("-----------studentId: ", studentId);
 
     const {data: sessions = [], isLoading, error} = usePaidSessionByStudentId(studentId);

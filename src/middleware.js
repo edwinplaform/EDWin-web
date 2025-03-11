@@ -5,8 +5,8 @@ export default async function middleware(req) {
     const token = await getToken({req, secret: process.env.NEXTAUTH_SECRET});
     const {pathname} = req.nextUrl;
 
-    // Allow public routes (e.g., login, signup, home)
-    const publicRoutes = ['/', '/login', '/signup', '/tutor/signup', '/contact-us', '/become-tutor','/tutors', /^\/tutors\/[^/]+$/];
+    // Allow public routes
+    const publicRoutes = ['/', '/login', '/signup', '/tutor/signup','/admin/signup', '/contact-us', '/become-tutor','/tutors', /^\/tutors\/[^/]+$/];
     const onboardingRoutes = ['/tutor/onboarding', '/student/onboarding'];
 
     if (publicRoutes.some(route => typeof route === 'string' ? route === pathname : route.test(pathname))) {
@@ -18,14 +18,12 @@ export default async function middleware(req) {
         return NextResponse.redirect(new URL('/login', req.url));
     }
 
-    // Check if user is accessing a protected `/portal/*` route
+    // Check if user is accessing a protected
     if (pathname.startsWith('/portal')) {
-        // Redirect tutors to onboarding if they haven't completed it
         if (token.role === 'TUTOR' && !token.isOnboarding) {
             return NextResponse.redirect(new URL('/tutor/onboarding', req.url));
         }
 
-        // Redirect students to onboarding if they haven't completed it
         if (token.role === 'STUDENT' && !token.isOnboarding) {
             return NextResponse.redirect(new URL('/student/onboarding', req.url));
         }

@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import FacebookProvider from "next-auth/providers/facebook"
 import axiosInstance from "@/util/axiosInstance";
 
 export const authOptions = {
@@ -27,7 +26,7 @@ export const authOptions = {
                             image: res.data.user.profilePhotoUrl,
                             role: res.data.user.role,
                             isOnboarding: res.data.user.isOnboarding,
-                            accessToken: res.data.user.accessToken,
+                            accessToken: res.data.accessToken,
                         };
                     }
                     return null;
@@ -40,15 +39,12 @@ export const authOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         }),
-        FacebookProvider({
-            clientId: process.env.FACEBOOK_CLIENT_ID,
-            clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-        }),
     ],
     callbacks: {
+        // eslint-disable-next-line no-unused-vars
         async jwt({token, user, account}) {
             if (account && user) {
-                if (account.provider === "google" || account.provider === "facebook") {
+                if (account.provider === "google") {
                     try {
                         const res = await axiosInstance.post("/auth/oauth", {
                             email: user.email,
@@ -65,6 +61,7 @@ export const authOptions = {
                                 accessToken: res.data.user.accessToken,
                                 role: res.data.user.role,
                                 isOnboarding: res.data.user.isOnboarding,
+                                image: res.data.user.profilePhotoUrl,
                             };
                         }
                     } catch (err) {
@@ -79,6 +76,7 @@ export const authOptions = {
                         accessToken: user.accessToken,
                         role: user.role,
                         isOnboarding: user.isOnboarding,
+                        image: user.image || user.profilePhotoUrl,
                     };
                 }
             }
@@ -89,11 +87,12 @@ export const authOptions = {
                 session.user.id = token.id;
                 session.user.role = token.role;
                 session.user.isOnboarding = token.isOnboarding;
+                session.user.image = token.image;
                 session.accessToken = token.accessToken;
             }
             return session;
         },
-        async redirect({ url, baseUrl }) {
+        async redirect({url, baseUrl}) {
             if (url.startsWith(baseUrl)) {
                 return url;
             }
@@ -107,10 +106,11 @@ export const authOptions = {
     session: {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60,
+        updateAge: 0,
     },
     secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST };
+export {handler as GET, handler as POST};

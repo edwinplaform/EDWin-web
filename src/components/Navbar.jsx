@@ -37,7 +37,7 @@ const Nav = () => {
                 <div className="flex justify-between h-16">
                     {/* Logo */}
                     <div className="flex-shrink-0 flex items-center">
-                        <Link href="/" className="text-xl font-bold text-blue-900">
+                        <Link href="/" className="text-[28px] font-bold text-blue-900">
                             EDWin
                         </Link>
                     </div>
@@ -146,13 +146,6 @@ const Nav = () => {
                                         >
                                             Your Profile
                                         </Link>
-                                        <Link
-                                            href="/change-password"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            onClick={() => setIsProfileMenuOpen(false)}
-                                        >
-                                            Change Password
-                                        </Link>
                                         <button
                                             onClick={handleLogout}
                                             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -198,13 +191,6 @@ const Nav = () => {
                                             onClick={() => setIsProfileMenuOpen(false)}
                                         >
                                             Your Profile
-                                        </Link>
-                                        <Link
-                                            href="/change-password"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            onClick={() => setIsProfileMenuOpen(false)}
-                                        >
-                                            Change Password
                                         </Link>
                                         <button
                                             onClick={handleLogout}

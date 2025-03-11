@@ -500,9 +500,9 @@ import TutorChatModal from "@/components/chat/TutorChatModal";
 import {useCurrentUser} from "@/util/auth";
 
 const TutorSession = () => {
-    // const tutorId = "user_2o7YCKjTb6j4WK9loeH6hOElBXD";
-    const user = useCurrentUser();
-    const tutorId = user.id;
+    const tutorId = "user_2o7YCKjTb6j4WK9loeH6hOElBXD";
+    // const user = useCurrentUser();
+    // const tutorId = user.id;
     console.log("-----tutorId: ", tutorId);
 
     const {data: sessions = [], error, isLoading} = useSessionsByTutorId(tutorId);
