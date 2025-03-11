@@ -10,7 +10,7 @@ const Filter = ({onFilterChange}) => {
     const [searchKeyword, setSearchKeyword] = useState("");
 
     const subjects = [
-        { value: "Maths", label: "Mathematics" },
+        { value: "Mathematics", label: "Mathematics" },
         { value: "Physics", label: "Physics" },
         { value: "Chemistry", label: "Chemistry" },
         { value: "Biology", label: "Biology" },
@@ -42,33 +42,6 @@ const Filter = ({onFilterChange}) => {
     };
 
     return (
-        // <div className="p-8 bg-cusPurple w-full justify-self-center rounded-xl">
-        //     <div
-        //         className="flex flex-col md:flex-row items-center justify-self-center space-y-4 md:space-y-0 md:space-x-8">
-        //         <div className="w-full md:w-auto">
-        //             <Select
-        //                 style={{width: 300}}
-        //                 allowClear
-        //                 placeholder="Filter by Subject"
-        //                 onChange={handleSubjectChange}
-        //                 options={[
-        //                     {value: "Maths", label: "Maths"},
-        //                     {value: "Physics", label: "Physics"},
-        //                     {value: "Psychology", label: "Psychology"},
-        //                     {value: "Sociology", label: "Sociology"},
-        //                 ]}
-        //             />
-        //         </div>
-        //         <div className="w-full md:w-auto items-center justify-items-center">
-        //             <Search
-        //                 placeholder="Search by Name"
-        //                 allowClear
-        //                 onSearch={handleSearch}
-        //                 style={{width: 300}}
-        //             />
-        //         </div>
-        //     </div>
-        // </div>
         <div className="bg-white shadow-lg rounded-xl p-6 max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in">
                 {/* Subject Filter */}

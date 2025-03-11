@@ -7,6 +7,7 @@ import {useEffect} from "react";
 import Stats from "@/components/Stats";
 import WhyEDWin from "@/components/WhyEdwin";
 import {getCurrentUser} from "@/util/auth";
+import ReviewSlider from "@/components/ReviewSlider";
 
 export default function Home() {
 
@@ -39,6 +40,7 @@ export default function Home() {
             </div>
             <Stats/>
             <WhyEDWin/>
+            <ReviewSlider/>
             <div className="p-14 my-6 items-center justify-center flex">
                 <h2 className="relative text-3xl sm:text-7xl text-black font-semibold">Lessons {"you'll"} love.
                     Guaranteed.</h2>

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import moment from "moment";
 import {Rate} from "antd";
 
@@ -12,7 +11,6 @@ const Reviews = ({review}) => {
                 <p className="text-[14px] opacity-60">posted on {moment(review.createdAt).format("MM DD, YYYY")}</p>
             </div>
             <div className="py-3">
-                {/*<Image src="/rateStar.png" width={20} height={20} alt="rating"/>*/}
                 <Rate disabled value={review.rating} className="text-yellow-500"/>
             </div>
             <div className="mb-5 text-[15px]">

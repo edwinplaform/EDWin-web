@@ -1,13 +1,17 @@
 'use client';
 
 import React, {useState} from 'react';
-import {Button, Input, message, Modal, Space, Spin, Table, Tag} from 'antd';
+import {Button, Card, Input, message, Modal, Space, Spin, Table, Tag} from 'antd';
 import {useStudentPayments, useUpdateInvoicePayment} from "@/hooks/useInvoices";
-import {EyeOutlined, UploadOutlined} from "@ant-design/icons";
+import {CloseCircleOutlined, ExclamationCircleOutlined, EyeOutlined, UploadOutlined} from "@ant-design/icons";
 import moment from "moment/moment";
+import {useCurrentUser} from "@/util/auth";
 
 const TutorPayment = () => {
-    const tutorId = "user_2o7YCKjTb6j4WK9loeH6hOElBXD"
+    const user = useCurrentUser();
+    const tutorId = user?.id;
+    console.log("-----------studentId: ", tutorId);
+
     const {data: payments = [], isLoading, error} = useStudentPayments(tutorId);
     const useUpdateInvoicePaymentMutation = useUpdateInvoicePayment();
     console.log(payments);
@@ -73,13 +77,17 @@ const TutorPayment = () => {
             render: (payment) => (
                 <>
                     <Space size="middle">
-                        <Button
-                            icon={<EyeOutlined/>}
-                            type="link"
-                            onClick={() => window.open(payment.paymentReceiptUrl, "_blank")}
-                        >
-                            View Receipt
-                        </Button>
+                        {
+                            payment.paymentReceiptUrl && (
+                                <Button
+                                    icon={<EyeOutlined/>}
+                                    type="link"
+                                    onClick={() => window.open(payment.paymentReceiptUrl, "_blank")}
+                                >
+                                    View Receipt
+                                </Button>
+                            )
+                        }
 
                         {payment.status === "PAID" ? (
                             <div className="flex gap-3">
@@ -144,7 +152,28 @@ const TutorPayment = () => {
     };
 
     if (error) {
-        return <div>Error fetching sessions: {error.message}</div>;
+        const isNotFound = error.response?.status === 404;
+        return (
+            <div className="flex items-center justify-center min-h-screen p-4">
+                <Card className="text-center p-6 shadow-lg w-full max-w-md">
+                    {isNotFound ? (
+                        <>
+                            <ExclamationCircleOutlined className="text-4xl text-yellow-500 mb-4"/>
+                            <h2 className="text-lg font-semibold mb-2">No Payment Receipt</h2>
+                            <p className="text-gray-600">
+                                It looks like you don’t have any payment receipt.
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <CloseCircleOutlined className="text-4xl text-red-500 mb-4"/>
+                            <h2 className="text-lg font-semibold mb-2">Error Loading Payments</h2>
+                            <p className="text-gray-600">{error.message || "Something went wrong. Please try again later."}</p>
+                        </>
+                    )}
+                </Card>
+            </div>
+        );
     }
 
     return (

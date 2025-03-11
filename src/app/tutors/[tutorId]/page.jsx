@@ -15,6 +15,7 @@ const Tutor = () => {
     const {data: reviews = [], isLoading: reviewsLoading, error: reviewsError} = useTutorReview(tutorId);
 
     console.log("---row data: ", user);
+    console.log(reviews);
 
     if (!tutorId || isLoading || reviewsLoading) {
         return <div className="flex justify-center items-center min-h-screen">

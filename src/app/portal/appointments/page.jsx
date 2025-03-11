@@ -3,10 +3,14 @@ import React, {useState} from 'react';
 import {Table, Button, Space, Tag, message, Modal, Input, Spin} from 'antd';
 import {useAppointmentByTutorId, useDeleteAppointment, useUpdateAppointment} from "@/hooks/useAppointments";
 import {useCreateSession} from "@/hooks/useSessions";
+import {useCurrentUser} from "@/util/auth";
 
 const Appointments = () => {
 
-    const tutorId = "user_2o7YCKjTb6j4WK9loeH6hOElBXD"
+    // const tutorId = "user_2o7YCKjTb6j4WK9loeH6hOElBXD"
+    const user = useCurrentUser();
+    const tutorId = user?.id;
+    console.log("-----------studentId: ", tutorId);
 
     const {data: appointments = [], error, isLoading} = useAppointmentByTutorId(tutorId);
     const deleteAppointmentMutation = useDeleteAppointment();
