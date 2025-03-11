@@ -15,7 +15,7 @@ const defaultQueryOptions = {
 export const useTutorReview = (tutorId) => {
     return useQuery({
         queryKey: ["reviews", tutorId],
-        queryFn: () => getTutorReview(tutorId),
+        queryFn: () => getTutorReview(tutorId).then((response) => response.data),
         enabled: !!tutorId,
         ...defaultQueryOptions,
     });
