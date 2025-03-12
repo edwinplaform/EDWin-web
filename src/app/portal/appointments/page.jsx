@@ -1,13 +1,13 @@
 "use client"
 import React, {useState} from 'react';
-import {Table, Button, Space, Tag, message, Modal, Input, Spin} from 'antd';
+import {Table, Button, Space, Tag, message, Modal, Input, Spin, Card} from 'antd';
 import {useAppointmentByTutorId, useDeleteAppointment, useUpdateAppointment} from "@/hooks/useAppointments";
 import {useCreateSession} from "@/hooks/useSessions";
 import {useCurrentUser} from "@/util/auth";
+import {CloseCircleOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
 
 const Appointments = () => {
 
-    // const tutorId = "user_2o7YCKjTb6j4WK9loeH6hOElBXD"
     const user = useCurrentUser();
     const tutorId = user?.id;
     console.log("-----------studentId: ", tutorId);
@@ -15,7 +15,6 @@ const Appointments = () => {
     const {data: appointments = [], error, isLoading} = useAppointmentByTutorId(tutorId);
     const deleteAppointmentMutation = useDeleteAppointment();
     const updateAppointmentMutation = useUpdateAppointment();
-    // const createSessionMutation = useCreateSession();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedAppointmentKey, setSelectedAppointmentKey] = useState(null);
@@ -52,19 +51,6 @@ const Appointments = () => {
             await updateAppointmentMutation.mutateAsync({id: key, data: {status: "ACCEPTED"}});
             message.success(`Appointment ID: ${key} has been accepted.`);
 
-            // const sessionData = {
-            //     appointmentId: appointment.id,
-            //     studentId: appointment.studentId,
-            //     tutorId: tutorId,
-            //     subject: appointment.subject,
-            //     date: appointment.date,
-            //     startTime: appointment.startTime,
-            //     endTime: appointment.endTime
-            // }
-            //
-            // await createSessionMutation.mutateAsync(sessionData);
-            // console.log(`Session created for Appointment ID: ${key}.`);
-
         } catch (err) {
             message.error(`Error accepting appointment: ${err.message}`);
         }
@@ -99,7 +85,28 @@ const Appointments = () => {
     };
 
     if (error) {
-        return <div>Error fetching appointments: {error.message}</div>
+        const isNotFound = error.response?.status === 404;
+        return (
+            <div className="flex items-center justify-center min-h-screen p-4">
+                <Card className="text-center p-6 shadow-lg w-full max-w-md">
+                    {isNotFound ? (
+                        <>
+                            <ExclamationCircleOutlined className="text-4xl text-yellow-500 mb-4" />
+                            <h2 className="text-lg font-semibold mb-2">No Appointments Found</h2>
+                            <p className="text-gray-600">
+                                It looks like you don’t have any appointments yet. Book a session to get started!
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <CloseCircleOutlined className="text-4xl text-red-500 mb-4" />
+                            <h2 className="text-lg font-semibold mb-2">Error Loading Appointments</h2>
+                            <p className="text-gray-600">{error.message || "Something went wrong. Please try again later."}</p>
+                        </>
+                    )}
+                </Card>
+            </div>
+        );
     }
 
     if (appointments.length === 0) {

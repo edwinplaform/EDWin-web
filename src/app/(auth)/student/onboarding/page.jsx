@@ -7,8 +7,6 @@ import {useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import Image from "next/image";
-
-;
 import {message} from "antd";
 import {useUpdateUser} from "@/hooks/useUsers";
 import {useChatUserSetup} from "@/hooks/useChatUserSetup";
